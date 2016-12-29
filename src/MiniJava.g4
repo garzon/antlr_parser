@@ -1,6 +1,6 @@
 grammar MiniJava;
 
-goal : mainClass (classDeclaration)* ;
+goal : mainClass (classDeclaration)* EOF;
 
 mainClass : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' stmtBlock '}' ;
 
