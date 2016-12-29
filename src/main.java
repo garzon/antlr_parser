@@ -26,7 +26,7 @@ public class main {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         MiniJavaParser parser = new MiniJavaParser(tokens);
-        ParseTree tree = parser.main_class();
+        ParseTree tree = parser.mainClass();
 
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(new MiniJavaListener(), tree);
