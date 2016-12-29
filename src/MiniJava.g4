@@ -17,10 +17,10 @@ stmt : '{' (stmt)* '}'
     | ID '=' exp ';'
     | ID '[' exp ']' '=' exp ';' ;
 
-exp : exp ('&&' | '<' | '+' | '-' | '*') exp
-    | exp '[' exp ']'
+exp : exp '[' exp ']'
     | exp '.' 'length'
     | exp '.' ID '(' (exp (',' exp)* )? ')'
+    | exp ('&&' | '<' | '+' | '-' | '*') exp
     | INT
     | 'true'
     | 'false'
