@@ -11,7 +11,7 @@ public class MiniJavaListener extends MiniJavaBaseListener {
     @Override
     public void enterStmt(@NotNull MiniJavaParser.StmtContext ctx) {
         if(ctx.stmt() != null) {
-            System.out.printf("%s\n", ctx.stmt().toString());
+            System.out.print(ctx.stmt());
         }
     }
 

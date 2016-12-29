@@ -13,7 +13,7 @@ type : 'int' '[' ']' | 'boolean' | 'int' | ID ;
 stmt : '{' (stmt)* '}'
     | 'if' '(' exp ')' stmt 'else' stmt
     | 'while' '(' exp ')' stmt
-    | 'System.put.println' '(' exp ')' ';'
+    | 'System.out.println' '(' exp ')' ';'
     | ID '=' exp ';'
     | ID '[' exp ']' '=' exp ';' ;
 
