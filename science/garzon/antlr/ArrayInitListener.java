@@ -1,5 +1,5 @@
-// Generated from D:/文档/我在FDU/MiniJavaCompilerProject\ArrayInit.g4 by ANTLR 4.6
-package science.garzon.antlr.hello;
+// Generated from D:/文档/我在FDU/MiniJavaCompilerProject/src\ArrayInit.g4 by ANTLR 4.6
+package science.garzon.antlr;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

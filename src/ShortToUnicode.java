@@ -1,6 +1,8 @@
+package src;
+
 import com.sun.istack.internal.NotNull;
-import science.garzon.antlr.hello.ArrayInitBaseListener;
-import science.garzon.antlr.hello.ArrayInitParser;
+import science.garzon.antlr.ArrayInitBaseListener;
+import science.garzon.antlr.ArrayInitParser;
 
 /**
  * Created by ougar_000 on 2016/12/29.
@@ -8,12 +10,12 @@ import science.garzon.antlr.hello.ArrayInitParser;
 public class ShortToUnicode extends ArrayInitBaseListener {
     @Override
     public void enterInit(@NotNull ArrayInitParser.InitContext ctx) {
-        //System.out.print('"');
+        System.out.print('"');
     }
 
     @Override
     public void exitInit(@NotNull ArrayInitParser.InitContext ctx) {
-        //System.out.print('"');
+        System.out.print('"');
     }
 
     @Override
