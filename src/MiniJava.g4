@@ -4,10 +4,12 @@ goal : main_class (class_declaration)* ;
 
 main_class : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' stmt_block '}' ;
 
-class_declaration : 'class' ID ('extends' ID)? '{' (declaration)* '}' ;
+permission_desc : 'public' | 'protected' | 'private' ;
+
+class_declaration : permission_desc? 'class' ID ('extends' ID)? '{' (declaration)* '}' ;
 declaration : var_declaration | method_declaration ;
 var_declaration : type ID ';' ;
-method_declaration : 'public' type ID '(' (type ID (',' type ID)* )? ')' stmt_block ;
+method_declaration : permission_desc? type ID '(' (type ID (',' type ID)* )? ')' stmt_block ;
 
 type : 'int' '[' ']' | 'boolean' | 'int' | ID ;
 
@@ -15,7 +17,7 @@ stmt_block : '{' (stmt)* '}' ;
 
 stmt : var_declaration
     | stmt_block
-    | 'if' '(' exp ')' stmt 'else' stmt
+    | 'if' '(' exp ')' stmt ('else' stmt)?
     | 'while' '(' exp ')' stmt
     | 'System.out.println' '(' exp ')' ';'
     | 'return' exp ';'
