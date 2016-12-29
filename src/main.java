@@ -14,17 +14,17 @@ public class main {
 
         String sentence = "{1, 2, 3, 4}";
 
-        ArrayInitLexer lexer = new ArrayInitLexer(
+        MiniJavaLexer lexer = new MiniJavaLexer(
                 new ANTLRInputStream(sentence)
         );
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-        ArrayInitParser parser = new ArrayInitParser(tokens);
+        MiniJavaParser parser = new MiniJavaParser(tokens);
         ParseTree tree = parser.init();
 
         ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(new ShortToUnicode(), tree);
+        walker.walk(new MiniJavaListener(), tree);
 
         System.out.println();
     }
