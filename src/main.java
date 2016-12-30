@@ -1,4 +1,4 @@
-package src; /**
+/**
  * Created by ougar_000 on 2016/12/29.
  */
 
@@ -8,9 +8,7 @@ import java.nio.file.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import science.garzon.antlr.*;
+import miniJava.*;
 
 import java.nio.file.Files;
 
@@ -18,7 +16,7 @@ public class main {
 
     public static void main(String[] args) throws IOException {
 
-        String sentence = new String(Files.readAllBytes(Paths.get("d:/exampleMiniJavaProgram.minijava")));
+        String sentence = new String(Files.readAllBytes(Paths.get("D:/exampleMiniJavaProgram.minijava")));
 
         MiniJavaLexer lexer = new MiniJavaLexer(
                 new ANTLRInputStream(sentence)
@@ -29,7 +27,7 @@ public class main {
         MiniJavaParser parser = new MiniJavaParser(tokens);
         ParseTree tree = parser.goal();
 
-        MiniJavaVisitor visitor = new MiniJavaVisitor();
+        MyMiniJavaVisitor visitor = new MyMiniJavaVisitor();
         visitor.visit(tree);
 
         System.out.println();
