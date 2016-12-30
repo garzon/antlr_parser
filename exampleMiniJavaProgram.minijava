@@ -36,5 +36,18 @@ class SubClass extends ExampleMiniJava {
     }
 }
 
-class SubClass {
+class SubClass extends ClassFullOfErrors {
+    public int error1(int i) {
+        int i;
+        boolean errorAgain;
+        errorAgain = true;
+        boolean errorAgain;
+        {
+            int testBlock;
+            {
+                int testBlock;
+                boolean testBlock;
+            }
+        }
+    }
 }

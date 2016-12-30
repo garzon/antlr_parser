@@ -28,8 +28,6 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         currentClassName = ctx.className.getText();
         currentClass = new MiniJavaClass();
 
-        if(checkRedefinedClass(ctx)) return MiniJavaVar.makeRuntimeError();
-
         currentClass.parentClassName = ctx.parentName.getText();
         currentClass.ctx = ctx;
 
@@ -46,8 +44,6 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitMainClass(MiniJavaParser.MainClassContext ctx) {
         currentClassName = ctx.className.getText();
         currentClass = new MiniJavaClass();
-
-        if(checkRedefinedClass(ctx)) return MiniJavaVar.makeRuntimeError();
 
         currentClass.parentClassName = null;
         currentClass.ctx = null;
@@ -85,9 +81,6 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitMethodDeclaration(MiniJavaParser.MethodDeclarationContext ctx) {
         String methodName = ctx.methodName.getText();
         String permission = ctx.permissionDesc().getText();
-
-        if(permission == null) permission = "public";
-        else return CliUtil.err(ctx, "private methods are not supported yet.");
 
         currentClass.methods.put(methodName, ctx);
         currentClass.methodPermission.put(methodName, permission);

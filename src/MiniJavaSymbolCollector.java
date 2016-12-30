@@ -64,6 +64,7 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         String varType = ctx.type().getText();
         if(varCtx.isRedefinedVar(varName)) {
             CliUtil.err(ctx, String.format("Redefine variable '%s' of type '%s'", varName, varType));
+            hasSyntaxError = true;
             return MiniJavaVar.makeRuntimeError();
         }
         if(varCtx.isTopLevel()) {
@@ -86,7 +87,10 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         String permission = ctx.permissionDesc().getText();
 
         if(permission == null) permission = "public";
-        else return CliUtil.err(ctx, "private methods are not supported yet.");
+        if(permission.equals("private")) {
+            hasSyntaxError = true;
+            return CliUtil.err(ctx, "private methods are not supported yet.");
+        }
 
         currentClass.methods.put(methodName, ctx);
         currentClass.methodPermission.put(methodName, permission);
