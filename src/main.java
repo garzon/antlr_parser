@@ -32,6 +32,10 @@ public class main {
         walker.walk(collector, parser.goal());
 
         //if(args.length > 2 && args[1].equals("run")) {
+            /*if(collector.hasSyntaxError) {
+                System.out.println("There are syntax errors. Cannot execute the program.");
+                return;
+            }*/
             MiniJavaEvaluator evaluator = new MiniJavaEvaluator();
             evaluator.classesInfo = collector.classes;
             evaluator.visit(collector.root.mainClass());

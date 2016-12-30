@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * Created by ougar_000 on 2016/12/30.
  */
 public class MiniJavaSymbolCollector extends MiniJavaBaseListener {
+    public boolean hasSyntaxError = false;
+
     public MiniJavaParser.GoalContext root = null;
 
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
@@ -24,6 +26,7 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseListener {
 
         if(classes.get(currentClassName) != null) {
             CliUtil.err(ctx, "redefine class " + currentClassName);
+            hasSyntaxError = true;
             return;
         }
 
