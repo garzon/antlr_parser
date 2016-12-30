@@ -59,9 +59,22 @@ public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
-        if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeRuntimeError();
 
+        if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeRuntimeError();
         if(assignSym.equals("=")) return varCtx.assignVar(id, v);
+
+        if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeRuntimeError();
+        if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }
+        if(assignSym.equals("/=")) { findRes.value = (int)findRes.value / (int)v.value; return findRes; }
+        if(assignSym.equals("%=")) { findRes.value = (int)findRes.value % (int)v.value; return findRes; }
+        if(assignSym.equals("&=")) { findRes.value = (int)findRes.value & (int)v.value; return findRes; }
+        if(assignSym.equals("|=")) { findRes.value = (int)findRes.value | (int)v.value; return findRes; }
+        if(assignSym.equals("^=")) { findRes.value = (int)findRes.value ^ (int)v.value; return findRes; }
+        if(assignSym.equals("+=")) { findRes.value = (int)findRes.value + (int)v.value; return findRes; }
+        if(assignSym.equals("-=")) { findRes.value = (int)findRes.value - (int)v.value; return findRes; }
+        if(assignSym.equals("<<=")) { findRes.value = (int)findRes.value << (int)v.value; return findRes; }
+        if(assignSym.equals(">>>=")) { findRes.value = (int)findRes.value >>> (int)v.value; return findRes; }
+        if(assignSym.equals(">>=")) { findRes.value = (int)findRes.value >> (int)v.value; return findRes; }
 
         System.err.printf("[ERR] Assignment of '%s' is not implemented yet.\n", assignSym);
         return MiniJavaVar.makeRuntimeError();
