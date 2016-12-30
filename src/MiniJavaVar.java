@@ -2,13 +2,15 @@
  * Created by ougar_000 on 2016/12/30.
  */
 
+import com.sun.istack.internal.Nullable;
+
 import java.lang.*;
 
 public class MiniJavaVar {
     public String type;
     public Object value;
 
-    public MiniJavaVar(String _type, Object _value) {
+    public MiniJavaVar(String _type, @Nullable Object _value) {
         type = _type;
         value = _value;
     }
@@ -30,4 +32,6 @@ public class MiniJavaVar {
     }
 
     public static MiniJavaVar makeRuntimeError() { return new MiniJavaVar("0Error", 0); }
+
+    public static MiniJavaVar makeInit(String type) { return new MiniJavaVar(type, null); }
 }

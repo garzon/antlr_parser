@@ -1,5 +1,6 @@
 import java.lang.*;
 import miniJava.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by ougar_000 on 2016/12/30.
@@ -11,6 +12,59 @@ public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitGoal(MiniJavaParser.GoalContext ctx) {
         varCtx.enterBlock();
         return visitChildren(ctx);
+    }
+
+    @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
+        varCtx.assignVar(ctx.ID().getText(), MiniJavaVar.makeInit(ctx.type().getText()));
+        return MiniJavaVar.makeVoid();
+    }
+
+    private boolean checkAssignOprType(MiniJavaParser.AssignContext ctx, String type1, String type2) {
+        if(!type1.equals(type2)) {
+            System.err.printf("[ERR] Assignment '%s' of '%s': unexpected type '%s', '%s' expected", ctx.assignSym().getText(), ctx.getText(), type1, type2);
+            return false;
+        }
+        return true;
+    }
+
+    private MiniJavaVar idFoundOrNot(ParserRuleContext ctx, String id) {
+        MiniJavaVar findRes = varCtx.findVar(id);
+        if(findRes == null) {
+            System.err.printf("[ERR] Identifier '%s' in '%s' not found.\n", id, ctx.getText());
+            return null;
+        }
+        return findRes;
+    }
+
+    @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
+        String id = ctx.ID().getText();
+        MiniJavaVar findRes = idFoundOrNot(ctx, id);
+        if(findRes == null) return MiniJavaVar.makeRuntimeError();
+        return findRes;
+    }
+
+    @Override public MiniJavaVar visitAssign(MiniJavaParser.AssignContext ctx) {
+        String assignSym = ctx.assignSym().getText();
+        String id = ctx.ID().getText();
+
+        MiniJavaVar findRes = idFoundOrNot(ctx, id);
+        if(findRes == null) return MiniJavaVar.makeRuntimeError();
+
+        if(!assignSym.equals("=")) {
+            if(findRes.value == null) {
+                System.err.printf("[ERR] Variable '%s' used in '%s' before being initialized.\n", id, ctx.getText());
+                return MiniJavaVar.makeRuntimeError();
+            }
+        }
+
+        MiniJavaVar v = visit(ctx.exp());
+        if(v.isError()) return v;
+        if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeRuntimeError();
+
+        if(assignSym.equals("=")) return varCtx.assignVar(id, v);
+
+        System.err.printf("[ERR] Assignment of '%s' is not implemented yet.\n", assignSym);
+        return MiniJavaVar.makeRuntimeError();
     }
 
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
@@ -77,7 +131,6 @@ public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
         MiniJavaVar first = visit(ctx.first);
         MiniJavaVar second = visit(ctx.second);
-        System.out.println(ctx.getText());
         if(first.isError()) return first;
         if(second.isError()) return second;
         String opSym = ctx.op.getText();

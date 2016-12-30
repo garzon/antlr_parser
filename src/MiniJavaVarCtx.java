@@ -5,5 +5,5 @@
 import java.util.*;
 
 public class MiniJavaVarCtx {
-    public HashMap<String, MiniJavaVar> vars;
+    public HashMap<String, MiniJavaVar> vars = new HashMap<>();
 }

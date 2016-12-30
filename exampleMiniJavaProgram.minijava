@@ -2,6 +2,13 @@ class ExampleMiniJava {
     public static void main(String[] args) {
         int res;
         res = 0b10;
+        System.out.println(res);
+        res *= 8;
+        res -= 3;
+        int a;
+        a = 3;
+        res = res + a;
+        System.out.println(res);
         {
             int b;
             b = -+-++-2;

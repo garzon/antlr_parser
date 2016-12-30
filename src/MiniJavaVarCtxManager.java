@@ -19,8 +19,9 @@ public class MiniJavaVarCtxManager {
         contexts.pop();
     }
 
-    public void assignVar(String varName, MiniJavaVar varValue) {
+    public MiniJavaVar assignVar(String varName, MiniJavaVar varValue) {
         contexts.peek().vars.put(varName, varValue);
+        return varValue;
     }
 
     public MiniJavaVar findVar(String varName) {
