@@ -8,4 +8,15 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class MiniJavaSymbolCollector extends MiniJavaBaseListener {
     public HashMap<String, MiniJavaClass> classes;
+
+    public String currentClassName;
+
+
+    @Override public void enterClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
+        currentClassName = ctx.ID()
+    }
+
+    @Override public void exitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
+
+    }
 }

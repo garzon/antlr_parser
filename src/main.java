@@ -33,7 +33,7 @@ public class main {
 
             MiniJavaEvaluator evaluator = new MiniJavaEvaluator();
             evaluator.classesInfo = collector.classes;
-            evaluator.visit(parser.mainClass().stmtBlock());
+            evaluator.visit(parser.mainClass());
 
         //} else {
             System.out.println(parser.goal().toStringTree(parser));

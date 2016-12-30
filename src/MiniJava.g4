@@ -6,7 +6,7 @@ mainClass : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' 
 
 permissionDesc : 'public' | 'private' ;
 
-classDeclaration : permissionDesc? 'class' ID ('extends' ID)? '{' (declaration)* '}' ;
+classDeclaration : 'class' className=ID ('extends' parentName=ID)? '{' (declaration)* '}' ;
 declaration : varDeclaration | methodDeclaration ;
 varDeclaration : type ID ';' ;
 methodDeclaration : permissionDesc? type ID '(' (type ID (',' type ID)* )? ')' stmtBlock ;

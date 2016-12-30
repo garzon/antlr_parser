@@ -10,4 +10,6 @@ public class MiniJavaClass {
 
     public HashMap<String, ParserRuleContext> methods = new HashMap<>();
     public HashMap<String, String> methodPermission = new HashMap<>();
+
+    public String parentClassName = "";
 }
