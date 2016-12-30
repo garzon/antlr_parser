@@ -4,7 +4,7 @@ goal : mainClass (classDeclaration)* EOF;
 
 mainClass : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' stmtBlock '}' ;
 
-permissionDesc : 'public' | 'protected' | 'private' ;
+permissionDesc : 'public' | 'private' ;
 
 classDeclaration : permissionDesc? 'class' ID ('extends' ID)? '{' (declaration)* '}' ;
 declaration : varDeclaration | methodDeclaration ;

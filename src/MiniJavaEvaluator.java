@@ -1,4 +1,6 @@
 import java.lang.*;
+import java.util.HashMap;
+
 import miniJava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -7,7 +9,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 
 public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
-    MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
+    private MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
+    public HashMap<String, MiniJavaClass> classesInfo;
 
     @Override public MiniJavaVar visitGoal(MiniJavaParser.GoalContext ctx) {
         varCtx.enterBlock();
