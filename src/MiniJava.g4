@@ -19,41 +19,41 @@ assignSym : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&='
     | '|=' | '^=' | '~=' | '<<=' | '>>=' | '>>>='
 ;
 
-stmt : varDeclaration
-    | stmtBlock
-    | 'if' '(' exp ')' stmt ('else' stmt)?
-    | 'while' '(' exp ')' stmt
-    | 'System.out.println' '(' exp ')' ';'
-    | 'return' exp ';'
-    | ID assignSym exp ';'
-    | ID '[' exp ']' assignSym exp ';'
+stmt : varDeclaration #var
+    | stmtBlock #block
+    | 'if' '(' exp ')' stmt ('else' stmt)? #if
+    | 'while' '(' exp ')' stmt #while
+    | systemCallName='System.out.println' '(' exp ')' ';' #systemCall
+    | 'return' exp ';' #return
+    | ID assignSym v=exp ';' #assign
+    | ID '[' idx=exp ']' assignSym v=exp ';' #setIndexOf
 ;
 
-exp : intLiteral
-    | ID
-    | '(' exp ')'
-    | exp '[' exp ']'
-    | exp '.' 'length'
-    | exp '.' ID '(' (exp (',' exp)* )? ')'
-    | unaryOp=('!' | '+' | '-' | '~') exp
-    | exp binaryOp=('*' | '/' | '%') exp
-    | exp binaryOp=('+' | '-') exp
-    | exp binaryOp=('<<' | '>>' | '>>>') exp
-    | exp binaryOp=('<' | '>' | '<=' | '>=' | 'instanceof') exp
-    | exp binaryOp=('==' | '!=') exp
-    | exp binaryOp='&' exp
-    | exp binaryOp='^' exp
-    | exp binaryOp='|' exp
-    | exp binaryOp='&&' exp
-    | exp binaryOp='||' exp
-    | exp ternaryOp='?' exp ':' exp
-    | boolLiteral='true'
-    | boolLiteral='false'
-    | 'this'
-    | 'new' 'int' '[' exp ']'
-    | 'new' ID '(' ')'
+exp : intLiteral #literal
+    | ID #id
+    | '(' exp ')' #dummy
+    | id=exp '[' idx=exp ']' #indexOf
+    | id=exp '.' 'length' #getLength
+    | id=exp '.' ID '(' (exp (',' exp)* )? ')' #getMethod
+    | op=('!' | '+' | '-' | '~') first=exp #unaryOp
+    | first=exp op=('*' | '/' | '%') second=exp #binaryOp
+    | first=exp op=('+' | '-') second=exp #binaryOp
+    | first=exp op=('<<' | '>>' | '>>>') second=exp #binaryOp
+    | first=exp op=('<' | '>' | '<=' | '>=' | 'instanceof') second=exp #binaryOp
+    | first=exp op=('==' | '!=') second=exp #binaryOp
+    | first=exp op='&' second=exp #binaryOp
+    | first=exp op='^' second=exp #binaryOp
+    | first=exp op='|' second=exp #binaryOp
+    | first=exp op='&&' second=exp #binaryOp
+    | first=exp op='||' second=exp #binaryOp
+    | first=exp '?' second=exp ':' third=exp #ternaryOp
+    | boolLiteral #literal
+    | 'this' #this
+    | 'new' 'int' '[' exp ']' #newIntArr
+    | 'new' ID '(' ')' #newExp
 ;
 
+boolLiteral : 'true' | 'false' ;
 intLiteral : INT_HEX | INT_BIN | INT_DEC ;
 
 ID : [a-zA-Z_][a-zA-Z_0-9]* ;

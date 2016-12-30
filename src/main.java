@@ -27,11 +27,11 @@ public class main {
         MiniJavaParser parser = new MiniJavaParser(tokens);
         ParseTree tree = parser.goal();
 
-        if(args.length > 2 && args[1].equals("run")) {
+        //if(args.length > 2 && args[1].equals("run")) {
             MyMiniJavaVisitor visitor = new MyMiniJavaVisitor();
             visitor.visit(tree);
-        } else {
+        //} else {
             System.out.println(tree.toStringTree(parser));
-        }
+        //}
     }
 }

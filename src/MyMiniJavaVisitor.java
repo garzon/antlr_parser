@@ -1,46 +1,38 @@
 import java.lang.*;
 import miniJava.*;
-import com.sun.istack.internal.NotNull;
 
 /**
  * Created by ougar_000 on 2016/12/30.
  */
 
-public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<Object> {
-    @Override
-    public Object visitStmt(@NotNull MiniJavaParser.StmtContext ctx) {
-        if(ctx.stmt() != null) {
-            System.out.print(ctx.stmt());
+public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<MiniJavaVar> {
+
+    @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
+        MiniJavaVar a = visitChildren(ctx.exp());
+        System.out.println(a.value);
+        return a;
+    }
+
+    @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
+        switch (ctx.op.getText().charAt(0)) {
+            case '!':
+            case | '+' | '-' | '~'
         }
+        return visitChildren(ctx);
+    }
+
+    @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {
+        if(ctx.INT_BIN() != null) {
+            return Integer.parseInt(ctx.getText().substring(2), 2);
+        }
+        if(ctx.INT_DEC() != null) {
+            return Integer.parseInt(ctx.getText());
+        }
+        if(ctx.INT_HEX() != null) {
+            return Integer.parseInt(ctx.getText().substring(2), 16);
+        }
+        System.err.println("Unknown type of int literal.");
         return 0;
-    }
-
-    @Override public Object visitGoal(MiniJavaParser.GoalContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitMainClass(MiniJavaParser.MainClassContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitPermissionDesc(MiniJavaParser.PermissionDescContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitDeclaration(MiniJavaParser.DeclarationContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitMethodDeclaration(MiniJavaParser.MethodDeclarationContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitType(MiniJavaParser.TypeContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitAssignSym(MiniJavaParser.AssignSymContext ctx) { return visitChildren(ctx); }
-
-    @Override public Object visitExp(MiniJavaParser.ExpContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    @Override public Object visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {
-        return visitChildren(ctx);
     }
 
 }
