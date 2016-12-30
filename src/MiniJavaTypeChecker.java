@@ -1,12 +1,13 @@
-import java.lang.*;
-import java.util.*;
-import miniJava.*;
+import miniJava.MiniJavaBaseVisitor;
+import miniJava.MiniJavaParser;
 import org.antlr.v4.runtime.ParserRuleContext;
+
+import java.util.HashMap;
 
 /**
  * Created by ougar_000 on 2016/12/30.
  */
-public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
+public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     public boolean hasSyntaxError = false;
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
 
@@ -14,7 +15,7 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
     private MiniJavaClass currentClass;
     private MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
 
-    private boolean checkRedefinedClass(ParserRuleContext ctx) {
+    private boolean findDefinedClass(ParserRuleContext ctx, String className) {
         if(classes.get(currentClassName) != null) {
             CliUtil.err(ctx, "redefine class " + currentClassName);
             hasSyntaxError = true;

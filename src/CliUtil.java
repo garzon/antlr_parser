@@ -26,7 +26,7 @@ public class CliUtil {
         return tokens;
     }
 
-    public static void err(ParserRuleContext ctx, String msg) {
+    public static MiniJavaVar err(ParserRuleContext ctx, String msg) {
         Token firstToken = ctx.getStart();
         String sourceContext = "";
         for(Token token: getFirst10Tokens(ctx)) {
@@ -35,5 +35,6 @@ public class CliUtil {
         sourceContext += "...";
         System.err.printf("[ERR] Line %d, Char %d, '%s':\n\t%s\n", firstToken.getLine(), firstToken.getCharPositionInLine(),
                 sourceContext, msg);
+        return MiniJavaVar.makeRuntimeError();
     }
 }

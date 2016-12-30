@@ -9,7 +9,8 @@ declaration : propertyDeclaration | methodDeclaration ;
 propertyDeclaration : varDeclaration ;
 varDeclaration : type ID ';' ;
 permissionDesc : 'public' | 'private' ;
-methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (type ID (',' type ID)* )? ')' stmtBlock ;
+argPair : type ID ;
+methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (argPair (',' argPair)* )? ')' stmtBlock ;
 
 type : 'int' '[' ']' | 'boolean' | 'int' | ID ;
 

@@ -19,6 +19,8 @@ public class MiniJavaVarCtxManager {
         contexts.pop();
     }
 
+    public boolean isTopLevel() { return contexts.size() == 1; }
+
     public MiniJavaVar assignVar(String varName, MiniJavaVar varValue) {
         contexts.peek().vars.put(varName, varValue);
         return varValue;
@@ -34,5 +36,10 @@ public class MiniJavaVarCtxManager {
         }
         System.err.printf("Runtime Error: identifier %s not found.\n", varName);
         return MiniJavaVar.makeVoid();
+    }
+
+    public boolean isRedefinedVar(String varName) {
+        MiniJavaVar findRes = contexts.peek().vars.get(varName);
+        return findRes != null;
     }
 }

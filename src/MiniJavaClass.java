@@ -7,10 +7,11 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import miniJava.*;
 
 public class MiniJavaClass {
-    public Vector<String> propertyName = new Vector<>();
+    public HashMap<String, String> property = new HashMap<>();
 
     public HashMap<String, ParserRuleContext> methods = new HashMap<>();
     public HashMap<String, String> methodPermission = new HashMap<>();
+    public HashMap<String, HashMap<String, String>> methodArgs = new HashMap<>();
 
     public String parentClassName = null;
 

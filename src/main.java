@@ -24,27 +24,34 @@ public class main {
         MiniJavaLexer lexer = new MiniJavaLexer(
                 new ANTLRInputStream(sentence)
         );
-
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         MiniJavaParser parser = new MiniJavaParser(tokens);
+        parser.setBuildParseTree(true);
 
         MiniJavaBaseListener treeSaver = new MiniJavaBaseListener() {
             @Override public void enterGoal (MiniJavaParser.GoalContext ctx){
                 root = ctx;
             }
         };
-        MiniJavaSymbolCollector collector = new MiniJavaSymbolCollector();
-        parser.setBuildParseTree(true);
         ParseTreeWalker.DEFAULT.walk(treeSaver, parser.goal());
 
+        MiniJavaSymbolCollector collector = new MiniJavaSymbolCollector();
         collector.visit(root);
+        if(collector.hasSyntaxError) {
+            System.err.println("There are syntax errors. Cannot execute the program.");
+            return;
+        }
+
+        MiniJavaTypeChecker checker = new MiniJavaTypeChecker();
+        checker.classes = collector.classes;
+        checker.visit(root);
+        if(checker.hasSyntaxError) {
+            System.err.println("There are syntax errors. Cannot execute the program.");
+            return;
+        }
 
         //if(args.length > 2 && args[1].equals("run")) {
-            /*if(collector.hasSyntaxError) {
-                System.out.println("There are syntax errors. Cannot execute the program.");
-                return;
-            }*/
             MiniJavaEvaluator evaluator = new MiniJavaEvaluator();
             evaluator.classesInfo = collector.classes;
             evaluator.visit(root.mainClass());
