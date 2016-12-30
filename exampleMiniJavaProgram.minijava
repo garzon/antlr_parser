@@ -18,7 +18,7 @@ class ExampleMiniJava {
                 b = 0x1a >> 2 & 3 + 3;
             }
         }
-        System.out.println(1+3*2 > 5 || 3 + 1 != 2);
+        System.out.println(1+3*2 < 5 || 1 + 1 != 2);
     }
 }
 
@@ -34,4 +34,7 @@ class SubClass extends ExampleMiniJava {
     private ExampleMiniJava makeInst() {
         return new ExampleMiniJava();
     }
+}
+
+class SubClass {
 }

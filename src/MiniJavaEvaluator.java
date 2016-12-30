@@ -21,6 +21,11 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         return MiniJavaVar.makeVoid();
     }
 
+    @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
+        MiniJavaVar v = visit(ctx.exp());
+        return Eval.visitSystemCall(ctx, v);
+    }
+
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
         varCtx.assignVar(ctx.ID().getText(), MiniJavaVar.makeInit(ctx.type().getText()));
         return MiniJavaVar.makeVoid();
@@ -87,18 +92,7 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         return MiniJavaVar.makeRuntimeError();
     }
 
-    @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
-        MiniJavaVar a = visit(ctx.exp());
-        if(a.isError()) return a;
-        if(a.type.equals("int"))
-            System.out.println(a.value);
-        if(a.type.equals("boolean"))
-            System.out.println(a.value != 0);
-        if(a.type.equals("int[]")) {
-            System.out.println("println: int[] is not supported yet.");
-        }
-        return a;
-    }
+
 
     private boolean checkUnaryOprType(MiniJavaParser.UnaryOpContext ctx, String type1, String type2) {
         if(!type1.equals(type2)) {
@@ -135,90 +129,12 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         return res;
     }
 
-    private boolean checkBinaryOprType(MiniJavaParser.BinaryOpContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
-            System.err.printf("[ERR] binaryOp '%s' of '%s': type '%s' and '%s' not match", ctx.op.getText(), ctx.getText(), type1, type2);
-            return false;
-        }
-        return true;
-    }
 
-    private MiniJavaVar opNotImplemented(MiniJavaParser.BinaryOpContext ctx) {
-        System.err.printf("[ERR] binaryOp '%s' of '%s': not implemented yet", ctx.op.getText(), ctx.getText());
-        return MiniJavaVar.makeRuntimeError();
-    }
 
     @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
         MiniJavaVar first = visit(ctx.first);
         MiniJavaVar second = visit(ctx.second);
-        if(first.isError()) return first;
-        if(second.isError()) return second;
-        String opSym = ctx.op.getText();
-
-        if(!checkBinaryOprType(ctx, first.type, second.type)) return MiniJavaVar.makeRuntimeError();
-
-        if(opSym.equals("==")) {
-            if(first.type.equals("int")) {
-                return MiniJavaVar.makeBool((int)first.value == (int)second.value);
-            }
-            if(first.type.equals("boolean")) {
-                return MiniJavaVar.makeBool((boolean)first.value == (boolean)second.value);
-            }
-            return opNotImplemented(ctx);
-        }
-        if(opSym.equals("!=")) {
-            if(first.type.equals("int")) {
-                return MiniJavaVar.makeBool((int)first.value != (int)second.value);
-            }
-            if(first.type.equals("boolean")) {
-                return MiniJavaVar.makeBool((boolean)first.value != (boolean)second.value);
-            }
-            return opNotImplemented(ctx);
-        }
-
-        if(opSym.equals("||")) {
-            if(!checkBinaryOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeRuntimeError();
-            return MiniJavaVar.makeBool((boolean)first.value || (boolean)second.value);
-        }
-        if(opSym.equals("&&")) {
-            if(!checkBinaryOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeRuntimeError();
-            return MiniJavaVar.makeBool((boolean)first.value || (boolean)second.value);
-        }
-
-        if(!checkBinaryOprType(ctx, first.type, "int")) return MiniJavaVar.makeRuntimeError();
-
-        if(opSym.equals("*"))
-            return MiniJavaVar.makeInt((int)first.value * (int)second.value);
-        if(opSym.equals("/"))
-            return MiniJavaVar.makeInt((int)first.value / (int)second.value);
-        if(opSym.equals("%"))
-            return MiniJavaVar.makeInt((int)first.value % (int)second.value);
-        if(opSym.equals("+"))
-            return MiniJavaVar.makeInt((int)first.value + (int)second.value);
-        if(opSym.equals("-"))
-            return MiniJavaVar.makeInt((int)first.value - (int)second.value);
-        if(opSym.equals("<<"))
-            return MiniJavaVar.makeInt((int)first.value << (int)second.value);
-        if(opSym.equals(">>>"))
-            return MiniJavaVar.makeInt((int)first.value >>> (int)second.value);
-        if(opSym.equals(">>"))
-            return MiniJavaVar.makeInt((int)first.value >> (int)second.value);
-        if(opSym.equals("<"))
-            return MiniJavaVar.makeBool((int)first.value < (int)second.value);
-        if(opSym.equals("<="))
-            return MiniJavaVar.makeBool((int)first.value <= (int)second.value);
-        if(opSym.equals(">"))
-            return MiniJavaVar.makeBool((int)first.value > (int)second.value);
-        if(opSym.equals(">="))
-            return MiniJavaVar.makeBool((int)first.value >= (int)second.value);
-        if(opSym.equals("^"))
-            return MiniJavaVar.makeInt((int)first.value ^ (int)second.value);
-        if(opSym.equals("|"))
-            return MiniJavaVar.makeInt((int)first.value | (int)second.value);
-        if(opSym.equals("&"))
-            return MiniJavaVar.makeInt((int)first.value & (int)second.value);
-
-        return opNotImplemented(ctx);
+        return Eval.binaryOp(ctx, first, second);
     }
 
     @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {

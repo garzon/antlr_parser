@@ -2,14 +2,13 @@ grammar MiniJava;
 
 goal : mainClass (classDeclaration)* EOF;
 
-mainClass : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' stmtBlock '}' ;
-
-permissionDesc : 'public' | 'private' ;
+mainClass : 'class' className=ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' args=ID ')' stmtBlock '}' ;
 
 classDeclaration : 'class' className=ID ('extends' parentName=ID)? '{' (declaration)* '}' ;
 declaration : propertyDeclaration | methodDeclaration ;
 propertyDeclaration : varDeclaration ;
 varDeclaration : type ID ';' ;
+permissionDesc : 'public' | 'private' ;
 methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (type ID (',' type ID)* )? ')' stmtBlock ;
 
 type : 'int' '[' ']' | 'boolean' | 'int' | ID ;

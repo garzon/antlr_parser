@@ -175,12 +175,14 @@ public class MiniJavaParser extends Parser {
 	}
 
 	public static class MainClassContext extends ParserRuleContext {
+		public Token className;
+		public Token args;
+		public StmtBlockContext stmtBlock() {
+			return getRuleContext(StmtBlockContext.class,0);
+		}
 		public List<TerminalNode> ID() { return getTokens(MiniJavaParser.ID); }
 		public TerminalNode ID(int i) {
 			return getToken(MiniJavaParser.ID, i);
-		}
-		public StmtBlockContext stmtBlock() {
-			return getRuleContext(StmtBlockContext.class,0);
 		}
 		public MainClassContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -210,7 +212,7 @@ public class MiniJavaParser extends Parser {
 			setState(39);
 			match(T__0);
 			setState(40);
-			match(ID);
+			((MainClassContext)_localctx).className = match(ID);
 			setState(41);
 			match(T__1);
 			setState(42);
@@ -230,7 +232,7 @@ public class MiniJavaParser extends Parser {
 			setState(49);
 			match(T__9);
 			setState(50);
-			match(ID);
+			((MainClassContext)_localctx).args = match(ID);
 			setState(51);
 			match(T__10);
 			setState(52);

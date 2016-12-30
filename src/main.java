@@ -7,12 +7,15 @@ import java.nio.file.*;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.*;
 import miniJava.*;
 
 import java.nio.file.Files;
 
 public class main {
+
+    public static MiniJavaParser.GoalContext root;
 
     public static void main(String[] args) throws IOException {
         //String sentence = new String(Files.readAllBytes(Paths.get(args[1])));
@@ -26,10 +29,16 @@ public class main {
 
         MiniJavaParser parser = new MiniJavaParser(tokens);
 
-        ParseTreeWalker walker = new ParseTreeWalker();
+        MiniJavaBaseListener treeSaver = new MiniJavaBaseListener() {
+            @Override public void enterGoal (MiniJavaParser.GoalContext ctx){
+                root = ctx;
+            }
+        };
         MiniJavaSymbolCollector collector = new MiniJavaSymbolCollector();
         parser.setBuildParseTree(true);
-        walker.walk(collector, parser.goal());
+        ParseTreeWalker.DEFAULT.walk(treeSaver, parser.goal());
+
+        collector.visit(root);
 
         //if(args.length > 2 && args[1].equals("run")) {
             /*if(collector.hasSyntaxError) {
@@ -38,9 +47,9 @@ public class main {
             }*/
             MiniJavaEvaluator evaluator = new MiniJavaEvaluator();
             evaluator.classesInfo = collector.classes;
-            evaluator.visit(collector.root.mainClass());
+            evaluator.visit(root.mainClass());
         //} else {
-            System.out.println(collector.root.toStringTree(parser));
+            System.out.println(root.toStringTree(parser));
         //}
     }
 }
