@@ -9,7 +9,13 @@ public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
         MiniJavaVar a = visitChildren(ctx.exp());
-        System.out.println(a.value);
+        if(a.type.equals("int"))
+            System.out.println(a.value);
+        if(a.type.equals("boolean"))
+            System.out.println(a.value != 0);
+        if(a.type.equals("int[]")) {
+            System.out.println("println: int[] is not supported yet.");
+        }
         return a;
     }
 
@@ -23,16 +29,16 @@ public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {
         if(ctx.INT_BIN() != null) {
-            return Integer.parseInt(ctx.getText().substring(2), 2);
+            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText().substring(2), 2));
         }
         if(ctx.INT_DEC() != null) {
-            return Integer.parseInt(ctx.getText());
+            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText()));
         }
         if(ctx.INT_HEX() != null) {
-            return Integer.parseInt(ctx.getText().substring(2), 16);
+            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText().substring(2), 16));
         }
         System.err.println("Unknown type of int literal.");
-        return 0;
+        return MiniJavaVar.makeVoid();
     }
 
 }
