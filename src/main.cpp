@@ -6,26 +6,30 @@
 #include "MiniJava/MiniJavaParser.h"
 #include "MiniJava/MiniJavaLexer.h"
 
+#include "MyMiniJavaVisitor.h"
+
 using namespace std;
 using namespace MiniJava;
 using namespace antlr4;
 
+#pragma execution_character_set("utf-8")
+
 int main(int argc, const char* argv[]) {
-	//String sentence = new String(Files.readAllBytes(Paths.get("d:/exampleMiniJavaProgram.minijava")));
-
-	string sourceCode;
 	ifstream ifs("../exampleMiniJavaProgram.minijava");
-	Antlr
+	if (!ifs.is_open()) return 1;
 
-	MiniJavaLexer lexer(ifs);
+	ANTLRInputStream inputStream(ifs);
 
-	CommonTokenStream tokens = new CommonTokenStream(lexer);
+	MiniJavaLexer lexer(&inputStream);
+	CommonTokenStream tokens(&lexer);
+	MiniJavaParser parser(&tokens);
 
-	MiniJavaParser parser = new MiniJavaParser(tokens);
-	ParseTree tree = parser.goal();
+	tree::ParseTree *tree = parser.goal();
+	MyMiniJavaVisitor visitor;
+	//tree::ParseTreeVisitor::visit(tree);
+	//visitor.visit(tree);
 
-	MiniJavaVisitor visitor = new MiniJavaVisitor();
-	visitor.visit(tree);
+	cout << tree->toStringTree(&parser) << endl;
 
-	System.out.println();
+	return 0;
 }
