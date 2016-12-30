@@ -6,11 +6,15 @@ import java.lang.*;
 
 public class MiniJavaVar {
     public String type;
-    public Integer value;
+    public Object value;
 
-    public MiniJavaVar(String _type, Integer _value) {
+    public MiniJavaVar(String _type, Object _value) {
         type = _type;
         value = _value;
+    }
+
+    public boolean isError() {
+        return type.equals("0Error");
     }
 
     public static MiniJavaVar makeVoid() {
@@ -20,4 +24,10 @@ public class MiniJavaVar {
     public static MiniJavaVar makeInt(Integer v) {
         return new MiniJavaVar("int", v);
     }
+
+    public static MiniJavaVar makeBool(boolean v) {
+        return new MiniJavaVar("boolean", v);
+    }
+
+    public static MiniJavaVar makeRuntimeError() { return new MiniJavaVar("0Error", 0); }
 }
