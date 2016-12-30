@@ -1000,6 +1000,8 @@ public class MiniJavaParser extends Parser {
 		}
 	}
 	public static class IfContext extends StmtContext {
+		public StmtContext t_stmt;
+		public StmtContext f_stmt;
 		public ExpContext exp() {
 			return getRuleContext(ExpContext.class,0);
 		}
@@ -1104,7 +1106,7 @@ public class MiniJavaParser extends Parser {
 				setState(130);
 				match(T__10);
 				setState(131);
-				stmt();
+				((IfContext)_localctx).t_stmt = stmt();
 				setState(134);
 				_errHandler.sync(this);
 				switch ( getInterpreter().adaptivePredict(_input,9,_ctx) ) {
@@ -1113,7 +1115,7 @@ public class MiniJavaParser extends Parser {
 					setState(132);
 					match(T__31);
 					setState(133);
-					stmt();
+					((IfContext)_localctx).f_stmt = stmt();
 					}
 					break;
 				}

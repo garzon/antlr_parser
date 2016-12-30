@@ -34,8 +34,7 @@ public class MiniJavaVarCtxManager {
                 return findRes;
             }
         }
-        System.err.printf("Runtime Error: identifier %s not found.\n", varName);
-        return MiniJavaVar.makeVoid();
+        return null;
     }
 
     public boolean isRedefinedVar(String varName) {

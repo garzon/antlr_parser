@@ -92,16 +92,30 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
             return CliUtil.err(ctx, "private methods are not supported yet.");
         }
 
+        if(currentClass.methods.get(methodName) != null) {
+            hasSyntaxError = true;
+            return CliUtil.err(ctx, "overloaded methods are not supported yet.");
+        }
         currentClass.methods.put(methodName, ctx);
         currentClass.methodPermission.put(methodName, permission);
 
+        varCtx.enterBlock();
+
         HashMap<String, String> methodArgs = new HashMap<>();
         for(MiniJavaParser.ArgPairContext arg: ctx.argPair()) {
-            methodArgs.put(arg.ID().getText(), arg.type().getText());
+            String varName, varType;
+            varName = arg.ID().getText();
+            varType = arg.type().getText();
+            methodArgs.put(varName, varType);
+            varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
         }
         currentClass.methodArgs.put(methodName, methodArgs);
 
-        return visitChildren(ctx);
+        MiniJavaVar res = visitChildren(ctx);
+
+        varCtx.exitBlock();
+
+        return res;
     }
 
 }

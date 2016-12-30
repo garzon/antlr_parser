@@ -22,7 +22,7 @@ assignSym : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&='
 
 stmt : varDeclaration #var
     | stmtBlock #block
-    | 'if' '(' exp ')' stmt ('else' stmt)? #if
+    | 'if' '(' exp ')' t_stmt=stmt ('else' f_stmt=stmt)? #if
     | 'while' '(' exp ')' stmt #while
     | systemCallName='System.out.println' '(' exp ')' ';' #systemCall
     | 'return' exp ';' #return

@@ -38,15 +38,12 @@ public class main {
 
         MiniJavaSymbolCollector collector = new MiniJavaSymbolCollector();
         collector.visit(root);
-        if(collector.hasSyntaxError) {
-            System.err.println("There are syntax errors. Cannot execute the program.");
-            return;
-        }
 
         MiniJavaTypeChecker checker = new MiniJavaTypeChecker();
         checker.classes = collector.classes;
         checker.visit(root);
-        if(checker.hasSyntaxError) {
+
+        if(collector.hasSyntaxError || checker.hasSyntaxError) {
             System.err.println("There are syntax errors. Cannot execute the program.");
             return;
         }

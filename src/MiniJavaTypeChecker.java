@@ -15,23 +15,19 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     private MiniJavaClass currentClass;
     private MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
 
-    private boolean findDefinedClass(ParserRuleContext ctx, String className) {
-        if(classes.get(currentClassName) != null) {
-            CliUtil.err(ctx, "redefine class " + currentClassName);
+    private MiniJavaClass findDefinedClass(ParserRuleContext ctx, String className) {
+        MiniJavaClass res = classes.get(className);
+        if(res == null) {
+            CliUtil.err(ctx, "undefined class " + className);
             hasSyntaxError = true;
-            return true;
         }
-        return false;
+        return res;
     }
 
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         currentClassName = ctx.className.getText();
-        currentClass = new MiniJavaClass();
+        currentClass = findDefinedClass(ctx, currentClassName);
 
-        currentClass.parentClassName = ctx.parentName.getText();
-        currentClass.ctx = ctx;
-
-        classes.put(currentClassName, currentClass);
         varCtx.enterBlock();
         visitChildren(ctx);
         varCtx.exitBlock();
@@ -43,10 +39,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitMainClass(MiniJavaParser.MainClassContext ctx) {
         currentClassName = ctx.className.getText();
-        currentClass = new MiniJavaClass();
-
-        currentClass.parentClassName = null;
-        currentClass.ctx = null;
+        currentClass = null;
 
         varCtx.enterBlock();
         varCtx.assignVar(ctx.args.getText(), new MiniJavaVar("String[]", null));
@@ -59,13 +52,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
         String varName = ctx.ID().getText();
         String varType = ctx.type().getText();
-        if(varCtx.isRedefinedVar(varName)) {
-            CliUtil.err(ctx, String.format("Redefine variable '%s' of type '%s'", varName, varType));
-            return MiniJavaVar.makeRuntimeError();
-        }
-        if(varCtx.isTopLevel()) {
-            currentClass.property.put(varName, varType);
-        }
+
         varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
 
         return MiniJavaVar.makeVoid();
@@ -79,19 +66,26 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitMethodDeclaration(MiniJavaParser.MethodDeclarationContext ctx) {
-        String methodName = ctx.methodName.getText();
-        String permission = ctx.permissionDesc().getText();
+        varCtx.enterBlock();
 
-        currentClass.methods.put(methodName, ctx);
-        currentClass.methodPermission.put(methodName, permission);
-
-        HashMap<String, String> methodArgs = new HashMap<>();
         for(MiniJavaParser.ArgPairContext arg: ctx.argPair()) {
-            methodArgs.put(arg.ID().getText(), arg.type().getText());
+            String varName, varType;
+            varName = arg.ID().getText();
+            varType = arg.type().getText();
+            varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
         }
-        currentClass.methodArgs.put(methodName, methodArgs);
 
+        MiniJavaVar res = visitChildren(ctx);
+
+        varCtx.exitBlock();
+
+        return res;
+    }
+
+    @Override public MiniJavaVar visitIf(MiniJavaParser.IfContext ctx) {
         return visitChildren(ctx);
     }
+
+    @Override
 
 }
