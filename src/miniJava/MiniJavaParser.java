@@ -28,19 +28,19 @@ public class MiniJavaParser extends Parser {
 		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, ID=66, INT_HEX=67, 
 		INT_BIN=68, INT_DEC=69, WS=70;
 	public static final int
-		RULE_goal = 0, RULE_mainClass = 1, RULE_permissionDesc = 2, RULE_classDeclaration = 3, 
-		RULE_declaration = 4, RULE_propertyDeclaration = 5, RULE_varDeclaration = 6, 
+		RULE_goal = 0, RULE_mainClass = 1, RULE_classDeclaration = 2, RULE_declaration = 3, 
+		RULE_propertyDeclaration = 4, RULE_varDeclaration = 5, RULE_permissionDesc = 6, 
 		RULE_methodDeclaration = 7, RULE_type = 8, RULE_stmtBlock = 9, RULE_assignSym = 10, 
 		RULE_stmt = 11, RULE_exp = 12, RULE_boolLiteral = 13, RULE_intLiteral = 14;
 	public static final String[] ruleNames = {
-		"goal", "mainClass", "permissionDesc", "classDeclaration", "declaration", 
-		"propertyDeclaration", "varDeclaration", "methodDeclaration", "type", 
-		"stmtBlock", "assignSym", "stmt", "exp", "boolLiteral", "intLiteral"
+		"goal", "mainClass", "classDeclaration", "declaration", "propertyDeclaration", 
+		"varDeclaration", "permissionDesc", "methodDeclaration", "type", "stmtBlock", 
+		"assignSym", "stmt", "exp", "boolLiteral", "intLiteral"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
 		null, "'class'", "'{'", "'public'", "'static'", "'void'", "'main'", "'('", 
-		"'String'", "'['", "']'", "')'", "'}'", "'private'", "'extends'", "';'", 
+		"'String'", "'['", "']'", "')'", "'}'", "'extends'", "';'", "'private'", 
 		"','", "'int'", "'boolean'", "'='", "'+='", "'-='", "'*='", "'/='", "'%='", 
 		"'&='", "'|='", "'^='", "'<<='", "'>>='", "'>>>='", "'if'", "'else'", 
 		"'while'", "'System.out.println'", "'return'", "'.'", "'length'", "'!'", 
@@ -252,56 +252,6 @@ public class MiniJavaParser extends Parser {
 		return _localctx;
 	}
 
-	public static class PermissionDescContext extends ParserRuleContext {
-		public PermissionDescContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_permissionDesc; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniJavaListener ) ((MiniJavaListener)listener).enterPermissionDesc(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniJavaListener ) ((MiniJavaListener)listener).exitPermissionDesc(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniJavaVisitor ) return ((MiniJavaVisitor<? extends T>)visitor).visitPermissionDesc(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final PermissionDescContext permissionDesc() throws RecognitionException {
-		PermissionDescContext _localctx = new PermissionDescContext(_ctx, getState());
-		enterRule(_localctx, 4, RULE_permissionDesc);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(55);
-			_la = _input.LA(1);
-			if ( !(_la==T__2 || _la==T__12) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
 	public static class ClassDeclarationContext extends ParserRuleContext {
 		public Token className;
 		public Token parentName;
@@ -336,44 +286,44 @@ public class MiniJavaParser extends Parser {
 
 	public final ClassDeclarationContext classDeclaration() throws RecognitionException {
 		ClassDeclarationContext _localctx = new ClassDeclarationContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_classDeclaration);
+		enterRule(_localctx, 4, RULE_classDeclaration);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(57);
+			setState(55);
 			match(T__0);
-			setState(58);
+			setState(56);
 			((ClassDeclarationContext)_localctx).className = match(ID);
-			setState(61);
+			setState(59);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__13) {
+			if (_la==T__12) {
 				{
-				setState(59);
-				match(T__13);
-				setState(60);
+				setState(57);
+				match(T__12);
+				setState(58);
 				((ClassDeclarationContext)_localctx).parentName = match(ID);
 				}
 			}
 
-			setState(63);
+			setState(61);
 			match(T__1);
-			setState(67);
+			setState(65);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (((((_la - 3)) & ~0x3f) == 0 && ((1L << (_la - 3)) & ((1L << (T__2 - 3)) | (1L << (T__12 - 3)) | (1L << (T__16 - 3)) | (1L << (T__17 - 3)) | (1L << (ID - 3)))) != 0)) {
+			while (((((_la - 3)) & ~0x3f) == 0 && ((1L << (_la - 3)) & ((1L << (T__2 - 3)) | (1L << (T__14 - 3)) | (1L << (T__16 - 3)) | (1L << (T__17 - 3)) | (1L << (ID - 3)))) != 0)) {
 				{
 				{
-				setState(64);
+				setState(62);
 				declaration();
 				}
 				}
-				setState(69);
+				setState(67);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(70);
+			setState(68);
 			match(T__11);
 			}
 		}
@@ -416,22 +366,22 @@ public class MiniJavaParser extends Parser {
 
 	public final DeclarationContext declaration() throws RecognitionException {
 		DeclarationContext _localctx = new DeclarationContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_declaration);
+		enterRule(_localctx, 6, RULE_declaration);
 		try {
-			setState(74);
+			setState(72);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(72);
+				setState(70);
 				propertyDeclaration();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(73);
+				setState(71);
 				methodDeclaration();
 				}
 				break;
@@ -473,11 +423,11 @@ public class MiniJavaParser extends Parser {
 
 	public final PropertyDeclarationContext propertyDeclaration() throws RecognitionException {
 		PropertyDeclarationContext _localctx = new PropertyDeclarationContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_propertyDeclaration);
+		enterRule(_localctx, 8, RULE_propertyDeclaration);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(76);
+			setState(74);
 			varDeclaration();
 			}
 		}
@@ -518,16 +468,66 @@ public class MiniJavaParser extends Parser {
 
 	public final VarDeclarationContext varDeclaration() throws RecognitionException {
 		VarDeclarationContext _localctx = new VarDeclarationContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_varDeclaration);
+		enterRule(_localctx, 10, RULE_varDeclaration);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(78);
+			setState(76);
 			type();
-			setState(79);
+			setState(77);
 			match(ID);
+			setState(78);
+			match(T__13);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class PermissionDescContext extends ParserRuleContext {
+		public PermissionDescContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_permissionDesc; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniJavaListener ) ((MiniJavaListener)listener).enterPermissionDesc(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniJavaListener ) ((MiniJavaListener)listener).exitPermissionDesc(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniJavaVisitor ) return ((MiniJavaVisitor<? extends T>)visitor).visitPermissionDesc(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final PermissionDescContext permissionDesc() throws RecognitionException {
+		PermissionDescContext _localctx = new PermissionDescContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_permissionDesc);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
 			setState(80);
-			match(T__14);
+			_la = _input.LA(1);
+			if ( !(_la==T__2 || _la==T__14) ) {
+			_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -589,7 +589,7 @@ public class MiniJavaParser extends Parser {
 			setState(83);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__2 || _la==T__12) {
+			if (_la==T__2 || _la==T__14) {
 				{
 				setState(82);
 				permissionDesc();
@@ -1104,7 +1104,7 @@ public class MiniJavaParser extends Parser {
 				setState(143);
 				match(T__10);
 				setState(144);
-				match(T__14);
+				match(T__13);
 				}
 				break;
 			case 6:
@@ -1116,7 +1116,7 @@ public class MiniJavaParser extends Parser {
 				setState(147);
 				exp(0);
 				setState(148);
-				match(T__14);
+				match(T__13);
 				}
 				break;
 			case 7:
@@ -1130,7 +1130,7 @@ public class MiniJavaParser extends Parser {
 				setState(152);
 				((AssignContext)_localctx).v = exp(0);
 				setState(153);
-				match(T__14);
+				match(T__13);
 				}
 				break;
 			case 8:
@@ -1150,7 +1150,7 @@ public class MiniJavaParser extends Parser {
 				setState(160);
 				((SetIndexOfContext)_localctx).v = exp(0);
 				setState(161);
-				match(T__14);
+				match(T__13);
 				}
 				break;
 			}
@@ -1993,34 +1993,34 @@ public class MiniJavaParser extends Parser {
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\3\2\7\2#\n\2\f\2"+
 		"\16\2&\13\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\4\3\4\3\5\3\5\3\5\3\5\5\5@\n\5\3\5\3\5\7\5D\n\5\f\5\16"+
-		"\5G\13\5\3\5\3\5\3\6\3\6\5\6M\n\6\3\7\3\7\3\b\3\b\3\b\3\b\3\t\5\tV\n\t"+
-		"\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\ta\n\t\f\t\16\td\13\t\5\tf\n\t"+
-		"\3\t\3\t\3\t\3\n\3\n\3\n\3\n\3\n\3\n\5\nq\n\n\3\13\3\13\7\13u\n\13\f\13"+
-		"\16\13x\13\13\3\13\3\13\3\f\3\f\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\5"+
-		"\r\u0087\n\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3"+
-		"\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\5\r\u00a6\n"+
-		"\r\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3"+
-		"\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u00bd\n\16\3\16\3\16\3\16"+
+		"\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\5\4>\n\4\3\4\3\4\7\4B\n\4\f\4\16\4E\13"+
+		"\4\3\4\3\4\3\5\3\5\5\5K\n\5\3\6\3\6\3\7\3\7\3\7\3\7\3\b\3\b\3\t\5\tV\n"+
+		"\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\ta\n\t\f\t\16\td\13\t\5\tf\n"+
+		"\t\3\t\3\t\3\t\3\n\3\n\3\n\3\n\3\n\3\n\5\nq\n\n\3\13\3\13\7\13u\n\13\f"+
+		"\13\16\13x\13\13\3\13\3\13\3\f\3\f\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r"+
+		"\5\r\u0087\n\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r"+
+		"\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\5\r\u00a6"+
+		"\n\r\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
+		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u00bd\n\16\3\16\3\16\3\16"+
 		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
 		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
 		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
 		"\3\16\3\16\3\16\3\16\3\16\3\16\7\16\u00f2\n\16\f\16\16\16\u00f5\13\16"+
 		"\5\16\u00f7\n\16\3\16\7\16\u00fa\n\16\f\16\16\16\u00fd\13\16\3\17\3\17"+
 		"\3\20\3\20\3\20\2\3\32\21\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36\2\f\4"+
-		"\2\5\5\17\17\3\2\25 \3\2(+\3\2,.\3\2)*\3\2/\61\3\2\62\66\3\2\678\3\2B"+
-		"C\3\2EG\u011d\2 \3\2\2\2\4)\3\2\2\2\69\3\2\2\2\b;\3\2\2\2\nL\3\2\2\2\f"+
-		"N\3\2\2\2\16P\3\2\2\2\20U\3\2\2\2\22p\3\2\2\2\24r\3\2\2\2\26{\3\2\2\2"+
+		"\2\5\5\21\21\3\2\25 \3\2(+\3\2,.\3\2)*\3\2/\61\3\2\62\66\3\2\678\3\2B"+
+		"C\3\2EG\u011d\2 \3\2\2\2\4)\3\2\2\2\69\3\2\2\2\bJ\3\2\2\2\nL\3\2\2\2\f"+
+		"N\3\2\2\2\16R\3\2\2\2\20U\3\2\2\2\22p\3\2\2\2\24r\3\2\2\2\26{\3\2\2\2"+
 		"\30\u00a5\3\2\2\2\32\u00bc\3\2\2\2\34\u00fe\3\2\2\2\36\u0100\3\2\2\2 "+
-		"$\5\4\3\2!#\5\b\5\2\"!\3\2\2\2#&\3\2\2\2$\"\3\2\2\2$%\3\2\2\2%\'\3\2\2"+
+		"$\5\4\3\2!#\5\6\4\2\"!\3\2\2\2#&\3\2\2\2$\"\3\2\2\2$%\3\2\2\2%\'\3\2\2"+
 		"\2&$\3\2\2\2\'(\7\2\2\3(\3\3\2\2\2)*\7\3\2\2*+\7D\2\2+,\7\4\2\2,-\7\5"+
 		"\2\2-.\7\6\2\2./\7\7\2\2/\60\7\b\2\2\60\61\7\t\2\2\61\62\7\n\2\2\62\63"+
 		"\7\13\2\2\63\64\7\f\2\2\64\65\7D\2\2\65\66\7\r\2\2\66\67\5\24\13\2\67"+
-		"8\7\16\2\28\5\3\2\2\29:\t\2\2\2:\7\3\2\2\2;<\7\3\2\2<?\7D\2\2=>\7\20\2"+
-		"\2>@\7D\2\2?=\3\2\2\2?@\3\2\2\2@A\3\2\2\2AE\7\4\2\2BD\5\n\6\2CB\3\2\2"+
-		"\2DG\3\2\2\2EC\3\2\2\2EF\3\2\2\2FH\3\2\2\2GE\3\2\2\2HI\7\16\2\2I\t\3\2"+
-		"\2\2JM\5\f\7\2KM\5\20\t\2LJ\3\2\2\2LK\3\2\2\2M\13\3\2\2\2NO\5\16\b\2O"+
-		"\r\3\2\2\2PQ\5\22\n\2QR\7D\2\2RS\7\21\2\2S\17\3\2\2\2TV\5\6\4\2UT\3\2"+
+		"8\7\16\2\28\5\3\2\2\29:\7\3\2\2:=\7D\2\2;<\7\17\2\2<>\7D\2\2=;\3\2\2\2"+
+		"=>\3\2\2\2>?\3\2\2\2?C\7\4\2\2@B\5\b\5\2A@\3\2\2\2BE\3\2\2\2CA\3\2\2\2"+
+		"CD\3\2\2\2DF\3\2\2\2EC\3\2\2\2FG\7\16\2\2G\7\3\2\2\2HK\5\n\6\2IK\5\20"+
+		"\t\2JH\3\2\2\2JI\3\2\2\2K\t\3\2\2\2LM\5\f\7\2M\13\3\2\2\2NO\5\22\n\2O"+
+		"P\7D\2\2PQ\7\20\2\2Q\r\3\2\2\2RS\t\2\2\2S\17\3\2\2\2TV\5\16\b\2UT\3\2"+
 		"\2\2UV\3\2\2\2VW\3\2\2\2WX\5\22\n\2XY\7D\2\2Ye\7\t\2\2Z[\5\22\n\2[b\7"+
 		"D\2\2\\]\7\22\2\2]^\5\22\n\2^_\7D\2\2_a\3\2\2\2`\\\3\2\2\2ad\3\2\2\2b"+
 		"`\3\2\2\2bc\3\2\2\2cf\3\2\2\2db\3\2\2\2eZ\3\2\2\2ef\3\2\2\2fg\3\2\2\2"+
@@ -2028,43 +2028,43 @@ public class MiniJavaParser extends Parser {
 		"\24\2\2nq\7\23\2\2oq\7D\2\2pj\3\2\2\2pm\3\2\2\2pn\3\2\2\2po\3\2\2\2q\23"+
 		"\3\2\2\2rv\7\4\2\2su\5\30\r\2ts\3\2\2\2ux\3\2\2\2vt\3\2\2\2vw\3\2\2\2"+
 		"wy\3\2\2\2xv\3\2\2\2yz\7\16\2\2z\25\3\2\2\2{|\t\3\2\2|\27\3\2\2\2}\u00a6"+
-		"\5\16\b\2~\u00a6\5\24\13\2\177\u0080\7!\2\2\u0080\u0081\7\t\2\2\u0081"+
-		"\u0082\5\32\16\2\u0082\u0083\7\r\2\2\u0083\u0086\5\30\r\2\u0084\u0085"+
-		"\7\"\2\2\u0085\u0087\5\30\r\2\u0086\u0084\3\2\2\2\u0086\u0087\3\2\2\2"+
-		"\u0087\u00a6\3\2\2\2\u0088\u0089\7#\2\2\u0089\u008a\7\t\2\2\u008a\u008b"+
-		"\5\32\16\2\u008b\u008c\7\r\2\2\u008c\u008d\5\30\r\2\u008d\u00a6\3\2\2"+
-		"\2\u008e\u008f\7$\2\2\u008f\u0090\7\t\2\2\u0090\u0091\5\32\16\2\u0091"+
-		"\u0092\7\r\2\2\u0092\u0093\7\21\2\2\u0093\u00a6\3\2\2\2\u0094\u0095\7"+
-		"%\2\2\u0095\u0096\5\32\16\2\u0096\u0097\7\21\2\2\u0097\u00a6\3\2\2\2\u0098"+
-		"\u0099\7D\2\2\u0099\u009a\5\26\f\2\u009a\u009b\5\32\16\2\u009b\u009c\7"+
-		"\21\2\2\u009c\u00a6\3\2\2\2\u009d\u009e\7D\2\2\u009e\u009f\7\13\2\2\u009f"+
-		"\u00a0\5\32\16\2\u00a0\u00a1\7\f\2\2\u00a1\u00a2\5\26\f\2\u00a2\u00a3"+
-		"\5\32\16\2\u00a3\u00a4\7\21\2\2\u00a4\u00a6\3\2\2\2\u00a5}\3\2\2\2\u00a5"+
-		"~\3\2\2\2\u00a5\177\3\2\2\2\u00a5\u0088\3\2\2\2\u00a5\u008e\3\2\2\2\u00a5"+
-		"\u0094\3\2\2\2\u00a5\u0098\3\2\2\2\u00a5\u009d\3\2\2\2\u00a6\31\3\2\2"+
-		"\2\u00a7\u00a8\b\16\1\2\u00a8\u00bd\5\36\20\2\u00a9\u00bd\7D\2\2\u00aa"+
-		"\u00ab\7\t\2\2\u00ab\u00ac\5\32\16\2\u00ac\u00ad\7\r\2\2\u00ad\u00bd\3"+
-		"\2\2\2\u00ae\u00af\t\4\2\2\u00af\u00bd\5\32\16\22\u00b0\u00bd\5\34\17"+
-		"\2\u00b1\u00bd\7@\2\2\u00b2\u00b3\7A\2\2\u00b3\u00b4\7\23\2\2\u00b4\u00b5"+
-		"\7\13\2\2\u00b5\u00b6\5\32\16\2\u00b6\u00b7\7\f\2\2\u00b7\u00bd\3\2\2"+
-		"\2\u00b8\u00b9\7A\2\2\u00b9\u00ba\7D\2\2\u00ba\u00bb\7\t\2\2\u00bb\u00bd"+
-		"\7\r\2\2\u00bc\u00a7\3\2\2\2\u00bc\u00a9\3\2\2\2\u00bc\u00aa\3\2\2\2\u00bc"+
-		"\u00ae\3\2\2\2\u00bc\u00b0\3\2\2\2\u00bc\u00b1\3\2\2\2\u00bc\u00b2\3\2"+
-		"\2\2\u00bc\u00b8\3\2\2\2\u00bd\u00fb\3\2\2\2\u00be\u00bf\f\21\2\2\u00bf"+
-		"\u00c0\t\5\2\2\u00c0\u00fa\5\32\16\22\u00c1\u00c2\f\20\2\2\u00c2\u00c3"+
-		"\t\6\2\2\u00c3\u00fa\5\32\16\21\u00c4\u00c5\f\17\2\2\u00c5\u00c6\t\7\2"+
-		"\2\u00c6\u00fa\5\32\16\20\u00c7\u00c8\f\16\2\2\u00c8\u00c9\t\b\2\2\u00c9"+
-		"\u00fa\5\32\16\17\u00ca\u00cb\f\r\2\2\u00cb\u00cc\t\t\2\2\u00cc\u00fa"+
-		"\5\32\16\16\u00cd\u00ce\f\f\2\2\u00ce\u00cf\79\2\2\u00cf\u00fa\5\32\16"+
-		"\r\u00d0\u00d1\f\13\2\2\u00d1\u00d2\7:\2\2\u00d2\u00fa\5\32\16\f\u00d3"+
-		"\u00d4\f\n\2\2\u00d4\u00d5\7;\2\2\u00d5\u00fa\5\32\16\13\u00d6\u00d7\f"+
-		"\t\2\2\u00d7\u00d8\7<\2\2\u00d8\u00fa\5\32\16\n\u00d9\u00da\f\b\2\2\u00da"+
-		"\u00db\7=\2\2\u00db\u00fa\5\32\16\t\u00dc\u00dd\f\7\2\2\u00dd\u00de\7"+
-		">\2\2\u00de\u00df\5\32\16\2\u00df\u00e0\7?\2\2\u00e0\u00e1\5\32\16\b\u00e1"+
-		"\u00fa\3\2\2\2\u00e2\u00e3\f\25\2\2\u00e3\u00e4\7\13\2\2\u00e4\u00e5\5"+
-		"\32\16\2\u00e5\u00e6\7\f\2\2\u00e6\u00fa\3\2\2\2\u00e7\u00e8\f\24\2\2"+
-		"\u00e8\u00e9\7&\2\2\u00e9\u00fa\7\'\2\2\u00ea\u00eb\f\23\2\2\u00eb\u00ec"+
-		"\7&\2\2\u00ec\u00ed\7D\2\2\u00ed\u00f6\7\t\2\2\u00ee\u00f3\5\32\16\2\u00ef"+
+		"\5\f\7\2~\u00a6\5\24\13\2\177\u0080\7!\2\2\u0080\u0081\7\t\2\2\u0081\u0082"+
+		"\5\32\16\2\u0082\u0083\7\r\2\2\u0083\u0086\5\30\r\2\u0084\u0085\7\"\2"+
+		"\2\u0085\u0087\5\30\r\2\u0086\u0084\3\2\2\2\u0086\u0087\3\2\2\2\u0087"+
+		"\u00a6\3\2\2\2\u0088\u0089\7#\2\2\u0089\u008a\7\t\2\2\u008a\u008b\5\32"+
+		"\16\2\u008b\u008c\7\r\2\2\u008c\u008d\5\30\r\2\u008d\u00a6\3\2\2\2\u008e"+
+		"\u008f\7$\2\2\u008f\u0090\7\t\2\2\u0090\u0091\5\32\16\2\u0091\u0092\7"+
+		"\r\2\2\u0092\u0093\7\20\2\2\u0093\u00a6\3\2\2\2\u0094\u0095\7%\2\2\u0095"+
+		"\u0096\5\32\16\2\u0096\u0097\7\20\2\2\u0097\u00a6\3\2\2\2\u0098\u0099"+
+		"\7D\2\2\u0099\u009a\5\26\f\2\u009a\u009b\5\32\16\2\u009b\u009c\7\20\2"+
+		"\2\u009c\u00a6\3\2\2\2\u009d\u009e\7D\2\2\u009e\u009f\7\13\2\2\u009f\u00a0"+
+		"\5\32\16\2\u00a0\u00a1\7\f\2\2\u00a1\u00a2\5\26\f\2\u00a2\u00a3\5\32\16"+
+		"\2\u00a3\u00a4\7\20\2\2\u00a4\u00a6\3\2\2\2\u00a5}\3\2\2\2\u00a5~\3\2"+
+		"\2\2\u00a5\177\3\2\2\2\u00a5\u0088\3\2\2\2\u00a5\u008e\3\2\2\2\u00a5\u0094"+
+		"\3\2\2\2\u00a5\u0098\3\2\2\2\u00a5\u009d\3\2\2\2\u00a6\31\3\2\2\2\u00a7"+
+		"\u00a8\b\16\1\2\u00a8\u00bd\5\36\20\2\u00a9\u00bd\7D\2\2\u00aa\u00ab\7"+
+		"\t\2\2\u00ab\u00ac\5\32\16\2\u00ac\u00ad\7\r\2\2\u00ad\u00bd\3\2\2\2\u00ae"+
+		"\u00af\t\4\2\2\u00af\u00bd\5\32\16\22\u00b0\u00bd\5\34\17\2\u00b1\u00bd"+
+		"\7@\2\2\u00b2\u00b3\7A\2\2\u00b3\u00b4\7\23\2\2\u00b4\u00b5\7\13\2\2\u00b5"+
+		"\u00b6\5\32\16\2\u00b6\u00b7\7\f\2\2\u00b7\u00bd\3\2\2\2\u00b8\u00b9\7"+
+		"A\2\2\u00b9\u00ba\7D\2\2\u00ba\u00bb\7\t\2\2\u00bb\u00bd\7\r\2\2\u00bc"+
+		"\u00a7\3\2\2\2\u00bc\u00a9\3\2\2\2\u00bc\u00aa\3\2\2\2\u00bc\u00ae\3\2"+
+		"\2\2\u00bc\u00b0\3\2\2\2\u00bc\u00b1\3\2\2\2\u00bc\u00b2\3\2\2\2\u00bc"+
+		"\u00b8\3\2\2\2\u00bd\u00fb\3\2\2\2\u00be\u00bf\f\21\2\2\u00bf\u00c0\t"+
+		"\5\2\2\u00c0\u00fa\5\32\16\22\u00c1\u00c2\f\20\2\2\u00c2\u00c3\t\6\2\2"+
+		"\u00c3\u00fa\5\32\16\21\u00c4\u00c5\f\17\2\2\u00c5\u00c6\t\7\2\2\u00c6"+
+		"\u00fa\5\32\16\20\u00c7\u00c8\f\16\2\2\u00c8\u00c9\t\b\2\2\u00c9\u00fa"+
+		"\5\32\16\17\u00ca\u00cb\f\r\2\2\u00cb\u00cc\t\t\2\2\u00cc\u00fa\5\32\16"+
+		"\16\u00cd\u00ce\f\f\2\2\u00ce\u00cf\79\2\2\u00cf\u00fa\5\32\16\r\u00d0"+
+		"\u00d1\f\13\2\2\u00d1\u00d2\7:\2\2\u00d2\u00fa\5\32\16\f\u00d3\u00d4\f"+
+		"\n\2\2\u00d4\u00d5\7;\2\2\u00d5\u00fa\5\32\16\13\u00d6\u00d7\f\t\2\2\u00d7"+
+		"\u00d8\7<\2\2\u00d8\u00fa\5\32\16\n\u00d9\u00da\f\b\2\2\u00da\u00db\7"+
+		"=\2\2\u00db\u00fa\5\32\16\t\u00dc\u00dd\f\7\2\2\u00dd\u00de\7>\2\2\u00de"+
+		"\u00df\5\32\16\2\u00df\u00e0\7?\2\2\u00e0\u00e1\5\32\16\b\u00e1\u00fa"+
+		"\3\2\2\2\u00e2\u00e3\f\25\2\2\u00e3\u00e4\7\13\2\2\u00e4\u00e5\5\32\16"+
+		"\2\u00e5\u00e6\7\f\2\2\u00e6\u00fa\3\2\2\2\u00e7\u00e8\f\24\2\2\u00e8"+
+		"\u00e9\7&\2\2\u00e9\u00fa\7\'\2\2\u00ea\u00eb\f\23\2\2\u00eb\u00ec\7&"+
+		"\2\2\u00ec\u00ed\7D\2\2\u00ed\u00f6\7\t\2\2\u00ee\u00f3\5\32\16\2\u00ef"+
 		"\u00f0\7\22\2\2\u00f0\u00f2\5\32\16\2\u00f1\u00ef\3\2\2\2\u00f2\u00f5"+
 		"\3\2\2\2\u00f3\u00f1\3\2\2\2\u00f3\u00f4\3\2\2\2\u00f4\u00f7\3\2\2\2\u00f5"+
 		"\u00f3\3\2\2\2\u00f6\u00ee\3\2\2\2\u00f6\u00f7\3\2\2\2\u00f7\u00f8\3\2"+
@@ -2074,7 +2074,7 @@ public class MiniJavaParser extends Parser {
 		"\u00d9\3\2\2\2\u00f9\u00dc\3\2\2\2\u00f9\u00e2\3\2\2\2\u00f9\u00e7\3\2"+
 		"\2\2\u00f9\u00ea\3\2\2\2\u00fa\u00fd\3\2\2\2\u00fb\u00f9\3\2\2\2\u00fb"+
 		"\u00fc\3\2\2\2\u00fc\33\3\2\2\2\u00fd\u00fb\3\2\2\2\u00fe\u00ff\t\n\2"+
-		"\2\u00ff\35\3\2\2\2\u0100\u0101\t\13\2\2\u0101\37\3\2\2\2\22$?ELUbepv"+
+		"\2\u00ff\35\3\2\2\2\u0100\u0101\t\13\2\2\u0101\37\3\2\2\2\22$=CJUbepv"+
 		"\u0086\u00a5\u00bc\u00f3\u00f6\u00f9\u00fb";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());

@@ -28,16 +28,6 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitMainClass(MiniJavaParser.MainClassContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniJavaParser#permissionDesc}.
-	 * @param ctx the parse tree
-	 */
-	void enterPermissionDesc(MiniJavaParser.PermissionDescContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniJavaParser#permissionDesc}.
-	 * @param ctx the parse tree
-	 */
-	void exitPermissionDesc(MiniJavaParser.PermissionDescContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MiniJavaParser#classDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -77,6 +67,16 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniJavaParser#permissionDesc}.
+	 * @param ctx the parse tree
+	 */
+	void enterPermissionDesc(MiniJavaParser.PermissionDescContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniJavaParser#permissionDesc}.
+	 * @param ctx the parse tree
+	 */
+	void exitPermissionDesc(MiniJavaParser.PermissionDescContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MiniJavaParser#methodDeclaration}.
 	 * @param ctx the parse tree

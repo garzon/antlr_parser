@@ -23,12 +23,6 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMainClass(MiniJavaParser.MainClassContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MiniJavaParser#permissionDesc}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPermissionDesc(MiniJavaParser.PermissionDescContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MiniJavaParser#classDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -52,6 +46,12 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniJavaParser#permissionDesc}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPermissionDesc(MiniJavaParser.PermissionDescContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MiniJavaParser#methodDeclaration}.
 	 * @param ctx the parse tree
