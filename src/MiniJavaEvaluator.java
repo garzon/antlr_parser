@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * Created by ougar_000 on 2016/12/30.
  */
 
-public class MyMiniJavaVisitor extends MiniJavaBaseVisitor<MiniJavaVar> {
+public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
     MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
 
     @Override public MiniJavaVar visitGoal(MiniJavaParser.GoalContext ctx) {
