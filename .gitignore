@@ -5,4 +5,4 @@ The*.pdf
 out/
 *.iml
 report/
-science/
+build/

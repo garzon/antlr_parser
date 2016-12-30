@@ -8,6 +8,7 @@ import java.nio.file.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import science.garzon.antlr.*;
 
@@ -26,10 +27,10 @@ public class main {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         MiniJavaParser parser = new MiniJavaParser(tokens);
-        ParseTree tree = parser.mainClass();
+        ParseTree tree = parser.goal();
 
-        ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(new MiniJavaListener(), tree);
+        MiniJavaVisitor visitor = new MiniJavaVisitor();
+        visitor.visit(tree);
 
         System.out.println();
     }
