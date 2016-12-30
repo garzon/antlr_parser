@@ -27,30 +27,12 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
-        varCtx.assignVar(ctx.ID().getText(), MiniJavaVar.makeInit(ctx.type().getText()));
-        return MiniJavaVar.makeVoid();
-    }
-
-    private boolean checkAssignOprType(MiniJavaParser.AssignContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
-            System.err.printf("[ERR] Assignment '%s' of '%s': unexpected type '%s', '%s' expected", ctx.assignSym().getText(), ctx.getText(), type1, type2);
-            return false;
-        }
-        return true;
-    }
-
-    private MiniJavaVar idFoundOrNot(ParserRuleContext ctx, String id) {
-        MiniJavaVar findRes = varCtx.findVar(id);
-        if(findRes == null) {
-            System.err.printf("[ERR] Identifier '%s' in '%s' not found.\n", id, ctx.getText());
-            return null;
-        }
-        return findRes;
+        return Eval.visitVarDeclaration(ctx, varCtx);
     }
 
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
         String id = ctx.ID().getText();
-        MiniJavaVar findRes = idFoundOrNot(ctx, id);
+        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
         if(findRes == null) return MiniJavaVar.makeRuntimeError();
         return findRes;
     }
@@ -59,7 +41,7 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         String assignSym = ctx.assignSym().getText();
         String id = ctx.ID().getText();
 
-        MiniJavaVar findRes = idFoundOrNot(ctx, id);
+        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
         if(findRes == null) return MiniJavaVar.makeRuntimeError();
 
         if(!assignSym.equals("=")) {
@@ -72,10 +54,10 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
 
-        if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeRuntimeError();
         if(assignSym.equals("=")) return varCtx.assignVar(id, v);
 
-        if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeRuntimeError();
         if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }
         if(assignSym.equals("/=")) { findRes.value = (int)findRes.value / (int)v.value; return findRes; }
         if(assignSym.equals("%=")) { findRes.value = (int)findRes.value % (int)v.value; return findRes; }

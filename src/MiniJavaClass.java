@@ -9,7 +9,7 @@ import miniJava.*;
 public class MiniJavaClass {
     public HashMap<String, String> property = new HashMap<>();
 
-    public HashMap<String, ParserRuleContext> methods = new HashMap<>();
+    public HashMap<String, MiniJavaParser.MethodDeclarationContext> methods = new HashMap<>();
     public HashMap<String, String> methodPermission = new HashMap<>();
     public HashMap<String, HashMap<String, String>> methodArgs = new HashMap<>();
 

@@ -11,7 +11,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     public boolean hasSyntaxError = false;
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
 
-    private String currentClassName;
+    private String currentClassName, currentMethodName;
     private MiniJavaClass currentClass;
     private MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
 
@@ -43,19 +43,16 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         varCtx.enterBlock();
         varCtx.assignVar(ctx.args.getText(), new MiniJavaVar("String[]", null));
+        currentMethodName = "main";
         visit(ctx.stmtBlock());
+        currentMethodName = null;
         varCtx.exitBlock();
 
         return MiniJavaVar.makeVoid();
     }
 
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
-        String varName = ctx.ID().getText();
-        String varType = ctx.type().getText();
-
-        varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
-
-        return MiniJavaVar.makeVoid();
+        return Eval.visitVarDeclaration(ctx, varCtx);
     }
 
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
@@ -75,17 +72,106 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
         }
 
+        currentMethodName = ctx.methodName.getText();
         MiniJavaVar res = visitChildren(ctx);
-
+        currentMethodName = null;
         varCtx.exitBlock();
 
         return res;
     }
 
     @Override public MiniJavaVar visitIf(MiniJavaParser.IfContext ctx) {
-        return visitChildren(ctx);
+        MiniJavaVar v = visit(ctx.exp());
+        if(v.isError()) return MiniJavaVar.makeRuntimeError();
+        MiniJavaVar criteria = Eval.visitIf(ctx, v);
+        if(criteria.isError()) return MiniJavaVar.makeRuntimeError();
+
+        MiniJavaVar ts = visit(ctx.t_stmt), fs = visit(ctx.f_stmt);
+        return (ts.isError() || fs.isError()) ? MiniJavaVar.makeRuntimeError() : MiniJavaVar.makeVoid();
     }
 
-    @Override
+    @Override public MiniJavaVar visitWhile(MiniJavaParser.WhileContext ctx) {
+        MiniJavaVar v = visit(ctx.exp());
+        if(v.isError()) return MiniJavaVar.makeRuntimeError();
+        return visit(ctx.stmt()).isError() ? MiniJavaVar.makeRuntimeError() : MiniJavaVar.makeVoid();
+    }
 
+    @Override public MiniJavaVar visitReturn(MiniJavaParser.ReturnContext ctx) {
+        MiniJavaParser.MethodDeclarationContext currentMethod;
+        currentMethod = SyntaxChecker.getMethodContext(classes, currentClassName, currentMethodName);
+        String retType = "void";
+        if(currentMethod == null && !currentMethodName.equals("main")) {
+            assert (false);
+        }
+        if(currentMethod != null) {
+            retType = currentMethod.returnType.getText();
+        }
+
+        MiniJavaVar v = visit(ctx.exp());
+        if(v.isError()) return v;
+        if(!SyntaxChecker.matchType(ctx, v.type, retType)) return MiniJavaVar.makeRuntimeError();
+        return MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitAssign(MiniJavaParser.AssignContext ctx) {
+        String assignSym = ctx.assignSym().getText();
+        String id = ctx.ID().getText();
+
+        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
+        if(findRes == null) return MiniJavaVar.makeRuntimeError();
+
+        MiniJavaVar v = visit(ctx.exp());
+        if(v.isError()) return v;
+
+        if(!SyntaxChecker.checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeRuntimeError();
+        if(assignSym.equals("=")) return MiniJavaVar.makeVoid();
+
+        if(!SyntaxChecker.checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeRuntimeError();
+        if(assignSym.equals("*=") ||
+            assignSym.equals("/=") ||
+            assignSym.equals("%=") ||
+            assignSym.equals("&=") ||
+            assignSym.equals("|=") ||
+            assignSym.equals("^=") ||
+            assignSym.equals("+=") ||
+            assignSym.equals("-=") ||
+            assignSym.equals("<<=") ||
+            assignSym.equals(">>>=") ||
+            assignSym.equals(">>=")) {
+            return MiniJavaVar.makeVoid();
+        }
+
+        CliUtil.err(ctx, String.format("Assignment of '%s' is not implemented yet.", assignSym));
+        return MiniJavaVar.makeRuntimeError();
+    }
+
+    @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
+        MiniJavaVar v = visit(ctx.exp());
+        return SyntaxChecker.println(ctx, v) ? MiniJavaVar.makeRuntimeError() : MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx) {
+        String id = ctx.ID().getText();
+
+        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
+        if(findRes == null) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.isArrayType(ctx, findRes.type)) return MiniJavaVar.makeRuntimeError();
+
+        MiniJavaVar idx = visit(ctx.idx);
+        if(idx.isError()) return idx;
+        if(!SyntaxChecker.matchType(ctx, idx.type, "int")) return MiniJavaVar.makeRuntimeError();
+
+        MiniJavaVar v = visit(ctx.v);
+        if(v.isError()) return v;
+        if(!SyntaxChecker.matchType(ctx, v.type, findRes.type.substring(0, findRes.type.length() - 2)))
+            return MiniJavaVar.makeRuntimeError();
+
+        return MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
+        MiniJavaVar first = visit(ctx.first);
+        MiniJavaVar second = visit(ctx.second);
+        return SyntaxChecker.binaryOp(ctx, first, second);
+    }
 }
