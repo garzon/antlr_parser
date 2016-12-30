@@ -27,9 +27,11 @@ public class main {
         MiniJavaParser parser = new MiniJavaParser(tokens);
         ParseTree tree = parser.goal();
 
-        MyMiniJavaVisitor visitor = new MyMiniJavaVisitor();
-        visitor.visit(tree);
-
-        System.out.println();
+        if(args.length > 2 && args[1].equals("run")) {
+            MyMiniJavaVisitor visitor = new MyMiniJavaVisitor();
+            visitor.visit(tree);
+        } else {
+            System.out.println(tree.toStringTree(parser));
+        }
     }
 }

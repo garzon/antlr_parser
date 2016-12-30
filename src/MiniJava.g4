@@ -35,20 +35,20 @@ exp : intLiteral
     | exp '[' exp ']'
     | exp '.' 'length'
     | exp '.' ID '(' (exp (',' exp)* )? ')'
-    | ('!' | '+' | '-' | '~') exp
-    | exp ('*' | '/' | '%') exp
-    | exp ('+' | '-') exp
-    | exp ('<<' | '>>' | '>>>') exp
-    | exp ('<' | '>' | '<=' | '>=' | 'instanceof') exp
-    | exp ('==' | '!=') exp
-    | exp '&' exp
-    | exp '^' exp
-    | exp '|' exp
-    | exp '&&' exp
-    | exp '||' exp
-    | exp '?' exp ':' exp
-    | 'true'
-    | 'false'
+    | unaryOp=('!' | '+' | '-' | '~') exp
+    | exp binaryOp=('*' | '/' | '%') exp
+    | exp binaryOp=('+' | '-') exp
+    | exp binaryOp=('<<' | '>>' | '>>>') exp
+    | exp binaryOp=('<' | '>' | '<=' | '>=' | 'instanceof') exp
+    | exp binaryOp=('==' | '!=') exp
+    | exp binaryOp='&' exp
+    | exp binaryOp='^' exp
+    | exp binaryOp='|' exp
+    | exp binaryOp='&&' exp
+    | exp binaryOp='||' exp
+    | exp ternaryOp='?' exp ':' exp
+    | boolLiteral='true'
+    | boolLiteral='false'
     | 'this'
     | 'new' 'int' '[' exp ']'
     | 'new' ID '(' ')'
