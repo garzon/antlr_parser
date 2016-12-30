@@ -7,9 +7,10 @@ mainClass : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' 
 permissionDesc : 'public' | 'private' ;
 
 classDeclaration : 'class' className=ID ('extends' parentName=ID)? '{' (declaration)* '}' ;
-declaration : varDeclaration | methodDeclaration ;
+declaration : propertyDeclaration | methodDeclaration ;
+propertyDeclaration : varDeclaration ;
 varDeclaration : type ID ';' ;
-methodDeclaration : permissionDesc? type ID '(' (type ID (',' type ID)* )? ')' stmtBlock ;
+methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (type ID (',' type ID)* )? ')' stmtBlock ;
 
 type : 'int' '[' ']' | 'boolean' | 'int' | ID ;
 

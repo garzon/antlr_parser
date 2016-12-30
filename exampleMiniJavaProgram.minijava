@@ -4,7 +4,9 @@ class ExampleMiniJava {
         res = 0b10;
         System.out.println(res);
         res *= 8;
+        System.out.println(res);
         res -= 3;
+        System.out.println(res);
         int a;
         a = 3;
         res = res + a;
@@ -20,7 +22,7 @@ class ExampleMiniJava {
     }
 }
 
-protected class SubClass extends ExampleMiniJava {
+class SubClass extends ExampleMiniJava {
     int[] arr;
     boolean flag;
     

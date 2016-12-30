@@ -12,9 +12,13 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
     private MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
     public HashMap<String, MiniJavaClass> classesInfo;
 
-    @Override public MiniJavaVar visitGoal(MiniJavaParser.GoalContext ctx) {
+    @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
         varCtx.enterBlock();
-        return visitChildren(ctx);
+        for(MiniJavaParser.StmtContext stmt: ctx.stmt()) {
+            if(visit(stmt).isError()) return MiniJavaVar.makeRuntimeError();
+        }
+        varCtx.exitBlock();
+        return MiniJavaVar.makeVoid();
     }
 
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
