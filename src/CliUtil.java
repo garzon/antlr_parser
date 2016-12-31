@@ -5,7 +5,6 @@
 import java.lang.*;
 import java.util.*;
 
-import miniJava.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -35,6 +34,6 @@ public class CliUtil {
         sourceContext += "...";
         System.err.printf("[ERR] Line %d, Char %d, '%s':\n\t%s\n", firstToken.getLine(), firstToken.getCharPositionInLine(),
                 sourceContext, msg);
-        return MiniJavaVar.makeRuntimeError();
+        return MiniJavaVar.makeError();
     }
 }

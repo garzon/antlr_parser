@@ -27,7 +27,7 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         currentClassName = ctx.className.getText();
         currentClass = new MiniJavaClass();
 
-        if(checkRedefinedClass(ctx)) return MiniJavaVar.makeRuntimeError();
+        if(checkRedefinedClass(ctx)) return MiniJavaVar.makeError();
 
         currentClass.parentClassName = ctx.parentName.getText();
         currentClass.ctx = ctx;
@@ -46,7 +46,7 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         currentClassName = ctx.className.getText();
         currentClass = new MiniJavaClass();
 
-        if(checkRedefinedClass(ctx)) return MiniJavaVar.makeRuntimeError();
+        if(checkRedefinedClass(ctx)) return MiniJavaVar.makeError();
 
         currentClass.parentClassName = null;
         currentClass.ctx = null;
@@ -65,7 +65,7 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(varCtx.isRedefinedVar(varName)) {
             CliUtil.err(ctx, String.format("Redefine variable '%s' of type '%s'", varName, varType));
             hasSyntaxError = true;
-            return MiniJavaVar.makeRuntimeError();
+            return MiniJavaVar.makeError();
         }
         if(varCtx.isTopLevel()) {
             currentClass.property.put(varName, varType);
@@ -87,10 +87,10 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         String permission = ctx.permissionDesc().getText();
 
         if(permission == null) permission = "public";
-        if(permission.equals("private")) {
+        /*if(permission.equals("private")) {
             hasSyntaxError = true;
             return CliUtil.err(ctx, "private methods are not supported yet.");
-        }
+        }*/
 
         if(currentClass.methods.get(methodName) != null) {
             hasSyntaxError = true;
@@ -101,12 +101,13 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         varCtx.enterBlock();
 
-        HashMap<String, String> methodArgs = new HashMap<>();
+        Vector<String> methodArgs = new Vector<>();
         for(MiniJavaParser.ArgPairContext arg: ctx.argPair()) {
             String varName, varType;
             varName = arg.ID().getText();
             varType = arg.type().getText();
-            methodArgs.put(varName, varType);
+            //methodArgs.put(varName, varType);
+            methodArgs.add(varType);
             varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
         }
         currentClass.methodArgs.put(methodName, methodArgs);

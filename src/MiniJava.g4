@@ -36,8 +36,6 @@ exp : intLiteral #literal
     | boolLiteral #literal
     | '(' exp ')' #dummy
 
-    | ID #id
-
     | id=exp '[' idx=exp ']' #indexOf
     | id=exp '.' ID '(' (exp (',' exp)* )? ')' #getMethod
     | id=exp '.' 'length' #getLength
@@ -56,8 +54,9 @@ exp : intLiteral #literal
     | first=exp op='?' second=exp ':' third=exp #ternaryOp
 
     | 'this' #this
-    | 'new' basicType '[' exp ']' #newIntArr
+    | 'new' basicType '[' exp ']' #newArr
     | 'new' ID '(' ')' #newExp
+    | ID #id
 ;
 
 boolLiteral : 'true' | 'false' ;
@@ -69,3 +68,4 @@ INT_BIN : '0b'[01]+;
 INT_DEC : [0-9]+ ;
 
 WS : [ \t\r\n]+ -> skip ;
+COMMENT : '//'[^\n]*[\n] -> skip;

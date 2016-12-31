@@ -2,7 +2,6 @@ import java.lang.*;
 import java.util.HashMap;
 
 import miniJava.*;
-import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by ougar_000 on 2016/12/30.
@@ -15,7 +14,7 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
         varCtx.enterBlock();
         for(MiniJavaParser.StmtContext stmt: ctx.stmt()) {
-            if(visit(stmt).isError()) return MiniJavaVar.makeRuntimeError();
+            if(visit(stmt).isError()) return MiniJavaVar.makeError();
         }
         varCtx.exitBlock();
         return MiniJavaVar.makeVoid();
@@ -33,7 +32,7 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
         String id = ctx.ID().getText();
         MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes == null) return MiniJavaVar.makeRuntimeError();
+        if(findRes == null) return MiniJavaVar.makeError();
         return findRes;
     }
 
@@ -42,22 +41,22 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         String id = ctx.ID().getText();
 
         MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes == null) return MiniJavaVar.makeRuntimeError();
+        if(findRes == null) return MiniJavaVar.makeError();
 
         if(!assignSym.equals("=")) {
             if(findRes.value == null) {
                 System.err.printf("[ERR] Variable '%s' used in '%s' before being initialized.\n", id, ctx.getText());
-                return MiniJavaVar.makeRuntimeError();
+                return MiniJavaVar.makeError();
             }
         }
 
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
 
-        if(!SyntaxChecker.checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
         if(assignSym.equals("=")) return varCtx.assignVar(id, v);
 
-        if(!SyntaxChecker.checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
         if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }
         if(assignSym.equals("/=")) { findRes.value = (int)findRes.value / (int)v.value; return findRes; }
         if(assignSym.equals("%=")) { findRes.value = (int)findRes.value % (int)v.value; return findRes; }
@@ -71,7 +70,7 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(assignSym.equals(">>=")) { findRes.value = (int)findRes.value >> (int)v.value; return findRes; }
 
         System.err.printf("[ERR] Assignment of '%s' is not implemented yet.\n", assignSym);
-        return MiniJavaVar.makeRuntimeError();
+        return MiniJavaVar.makeError();
     }
 
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
@@ -96,7 +95,7 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
             return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText().substring(2), 16));
         }
         System.err.println("Unknown type of int literal.");
-        return MiniJavaVar.makeRuntimeError();
+        return MiniJavaVar.makeError();
     }
 
 }

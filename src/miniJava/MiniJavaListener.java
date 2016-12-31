@@ -316,6 +316,18 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitUnaryOp(MiniJavaParser.UnaryOpContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code newArr}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewArr(MiniJavaParser.NewArrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code newArr}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewArr(MiniJavaParser.NewArrContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code id}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
 	 * @param ctx the parse tree
@@ -327,18 +339,6 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitId(MiniJavaParser.IdContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code newIntArr}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void enterNewIntArr(MiniJavaParser.NewIntArrContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code newIntArr}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void exitNewIntArr(MiniJavaParser.NewIntArrContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code getMethod}
 	 * labeled alternative in {@link MiniJavaParser#exp}.

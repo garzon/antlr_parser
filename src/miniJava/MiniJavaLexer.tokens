@@ -68,6 +68,7 @@ INT_HEX=67
 INT_BIN=68
 INT_DEC=69
 WS=70
+COMMENT=71
 'class'=1
 '{'=2
 'public'=3

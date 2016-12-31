@@ -31,7 +31,7 @@ public class MiniJavaVar {
         return new MiniJavaVar("boolean", v);
     }
 
-    public static MiniJavaVar makeRuntimeError() { return new MiniJavaVar("0Error", 0); }
+    public static MiniJavaVar makeError() { return new MiniJavaVar("0Error", 0); }
 
     public static MiniJavaVar makeInit(String type) { return new MiniJavaVar(type, null); }
 }

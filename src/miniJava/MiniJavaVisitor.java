@@ -193,19 +193,19 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnaryOp(MiniJavaParser.UnaryOpContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code newArr}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNewArr(MiniJavaParser.NewArrContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code id}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitId(MiniJavaParser.IdContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code newIntArr}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNewIntArr(MiniJavaParser.NewIntArrContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code getMethod}
 	 * labeled alternative in {@link MiniJavaParser#exp}.

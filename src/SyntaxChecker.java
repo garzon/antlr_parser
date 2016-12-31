@@ -17,6 +17,11 @@ public class SyntaxChecker {
         return true;
     }
 
+    public static String getElementType(String arrType) {
+        assert (arrType.endsWith("[]"));
+        return arrType.substring(0, arrType.length() - 2);
+    }
+
     public static boolean matchType(ParserRuleContext ctx, String type1, String type2) {
         if(!type1.equals(type2)) {
             CliUtil.err(ctx, String.format("Type error: '%s' expected, got '%s'", type2, type1));
@@ -51,7 +56,7 @@ public class SyntaxChecker {
 
     public static MiniJavaVar opNotImplemented(ParserRuleContext ctx, String op) {
         CliUtil.err(ctx, String.format("Op %s is not implemented yet", op));
-        return MiniJavaVar.makeRuntimeError();
+        return MiniJavaVar.makeError();
     }
 
     public static MiniJavaVar mockVar(MiniJavaVar original) {

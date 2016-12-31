@@ -20,7 +20,16 @@ public class Eval {
         MiniJavaVar findRes = varCtx.findVar(id);
         if(findRes == null) {
             CliUtil.err(ctx, String.format("Identifier '%s' not found.", id));
-            return MiniJavaVar.makeRuntimeError();
+            return MiniJavaVar.makeError();
+        }
+        return findRes;
+    }
+
+    public static MiniJavaParser.MethodDeclarationContext methodFoundOrNot(ParserRuleContext ctx, MiniJavaClass klass, String methodName) {
+        MiniJavaParser.MethodDeclarationContext findRes = klass.methods.get(methodName);
+        if(findRes == null) {
+            CliUtil.err(ctx, String.format("Method '%s' not found.", methodName));
+            return null;
         }
         return findRes;
     }
@@ -33,7 +42,7 @@ public class Eval {
     }
 
     public static MiniJavaVar visitIf(MiniJavaParser.IfContext ctx, MiniJavaVar v) {
-        if(!SyntaxChecker.matchType(ctx, v.type, "boolean")) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.matchType(ctx, v.type, "boolean")) return MiniJavaVar.makeError();
         return v;
     }
 
@@ -52,7 +61,7 @@ public class Eval {
             return a;
         }
         CliUtil.err(ctx, String.format("System.out.println: type '%s' is not supported.", a.type));
-        return MiniJavaVar.makeRuntimeError();
+        return MiniJavaVar.makeError();
     }
 
     public static MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx, MiniJavaVar a) {
@@ -64,18 +73,18 @@ public class Eval {
         String type = res.type;
         switch (ctx.op.getText().charAt(0)) {
             case '!':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "boolean")) return MiniJavaVar.makeRuntimeError();
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "boolean")) return MiniJavaVar.makeError();
                 res.value = !(boolean)res.value;
                 break;
             case '+':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
                 break;
             case '-':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
                 res.value = -(int)res.value;
                 break;
             case '~':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
                 res.value = ~(int)res.value;
                 break;
             default:
@@ -89,7 +98,7 @@ public class Eval {
         if(second.isError()) return second;
         String opSym = ctx.op.getText();
 
-        if(!SyntaxChecker.checkOprType(ctx, first.type, second.type)) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.checkOprType(ctx, first.type, second.type)) return MiniJavaVar.makeError();
 
         if(opSym.equals("==")) {
             if(first.type.equals("int")) {
@@ -111,24 +120,24 @@ public class Eval {
         }
 
         if(opSym.equals("||")) {
-            if(!SyntaxChecker.checkOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeRuntimeError();
+            if(!SyntaxChecker.checkOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
             return MiniJavaVar.makeBool((boolean)first.value || (boolean)second.value);
         }
         if(opSym.equals("&&")) {
-            if(!SyntaxChecker.checkOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeRuntimeError();
+            if(!SyntaxChecker.checkOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
             return MiniJavaVar.makeBool((boolean)first.value && (boolean)second.value);
         }
 
-        if(!SyntaxChecker.checkOprType(ctx, first.type, "int")) return MiniJavaVar.makeRuntimeError();
+        if(!SyntaxChecker.checkOprType(ctx, first.type, "int")) return MiniJavaVar.makeError();
 
         if(opSym.equals("*"))
             return MiniJavaVar.makeInt((int)first.value * (int)second.value);
         if(opSym.equals("/")) {
-            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeRuntimeError();
+            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeError();
             return MiniJavaVar.makeInt((int) first.value / (int)second.value);
         }
         if(opSym.equals("%")) {
-            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeRuntimeError();
+            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeError();
             return MiniJavaVar.makeInt((int) first.value % (int) second.value);
         }
         if(opSym.equals("+"))
@@ -166,8 +175,8 @@ public class Eval {
 
         String opSym = ctx.op.getText();
         if(opSym.equals("?")) {
-            if(!SyntaxChecker.matchType(ctx, first.type, "boolean")) return MiniJavaVar.makeRuntimeError();
-            if(!SyntaxChecker.matchType(ctx, second.type, third.type)) return MiniJavaVar.makeRuntimeError();
+            if(!SyntaxChecker.matchType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
+            if(!SyntaxChecker.matchType(ctx, second.type, third.type)) return MiniJavaVar.makeError();
             if((boolean)first.value) return second;
             else return third;
         }
