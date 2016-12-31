@@ -7,7 +7,7 @@ mainClass : 'class' className=ID '{' 'public' 'static' 'void' 'main' '(' 'String
 classDeclaration : 'class' className=ID ('extends' parentName=ID)? '{' (declaration)* '}' ;
 declaration : propertyDeclaration | methodDeclaration ;
 propertyDeclaration : varDeclaration ;
-varDeclaration : type ID ';' ;
+varDeclaration : type ID ('=' exp)? ';' ;
 permissionDesc : 'public' | 'private' ;
 argPair : type ID ;
 methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (argPair (',' argPair)* )? ')' stmtBlock ;

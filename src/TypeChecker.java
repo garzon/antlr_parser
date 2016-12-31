@@ -157,6 +157,11 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
         String varName = ctx.ID().getText();
         String varType = ctx.type().getText();
+        if(ctx.exp() != null) {
+            MiniJavaVar v = visit(ctx.exp());
+            if(v.isError()) return MiniJavaVar.makeError();
+            if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
+        }
         varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
         return MiniJavaVar.makeVoid();
     }
@@ -183,7 +188,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         }
 
         currentMethodName = ctx.methodName.getText();
-        MiniJavaVar res = visitChildren(ctx);
+        MiniJavaVar res = visit(ctx.stmtBlock());
         currentMethodName = null;
         varCtx.exitBlock();
 

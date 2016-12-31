@@ -8,6 +8,28 @@ import miniJava.*;
 
 public class Evaluator extends TypeChecker {
 
+    @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
+        return super.visitClassDeclaration(ctx);
+    }
+
+    @Override public MiniJavaVar visitMainClass(MiniJavaParser.MainClassContext ctx) {
+        return super.visitMainClass(ctx);
+    }
+
+    @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
+        String varName = ctx.ID().getText();
+        String varType = ctx.type().getText();
+        MiniJavaVar v = MiniJavaVar.makeInit(varType);
+        if(ctx.exp() != null) {
+            v = visit(ctx.exp());
+            if(v.isError()) return MiniJavaVar.makeError();
+            //if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
+            assert (matchType(ctx, v.type, varType));
+        }
+        varCtx.assignVar(varName, v);
+        return MiniJavaVar.makeVoid();
+    }
+
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
         varCtx.enterBlock();
         for(MiniJavaParser.StmtContext stmt: ctx.stmt()) {
@@ -17,13 +39,20 @@ public class Evaluator extends TypeChecker {
         return MiniJavaVar.makeVoid();
     }
 
+    @Override public MiniJavaVar visitBlock(MiniJavaParser.BlockContext ctx) {
+        return super.visitBlock(ctx);
+    }
+
+    @Override public MiniJavaVar visitMethodDeclaration(MiniJavaParser.MethodDeclarationContext ctx) {
+        currentMethodName = ctx.methodName.getText();
+        MiniJavaVar res = visit(ctx.stmtBlock());
+        currentMethodName = null;
+        return res;
+    }
+
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
         return systemCall(ctx, v, false);
-    }
-
-    @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
-        return super.visitVarDeclaration(ctx);
     }
 
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
