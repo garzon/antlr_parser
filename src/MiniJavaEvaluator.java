@@ -20,11 +20,11 @@ public class MiniJavaEvaluator extends MiniJavaTypeChecker {
 
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
-        return Eval.visitSystemCall(ctx, v);
+        return systemCall(ctx, v, false);
     }
 
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
-        return Eval.visitVarDeclaration(ctx, varCtx);
+        return super.visitVarDeclaration(ctx);
     }
 
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {

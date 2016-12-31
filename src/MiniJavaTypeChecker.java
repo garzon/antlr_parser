@@ -11,9 +11,20 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     public boolean hasSyntaxError = false;
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
 
-    protected String currentClassName, currentMethodName;
+    protected String currentClassName, currentMethodName, mainClassName;
     protected MiniJavaClass currentClass;
     protected MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
+
+    public static String getElementType(String arrType) {
+        assert (arrType.endsWith("[]"));
+        return arrType.substring(0, arrType.length() - 2);
+    }
+
+    private static MiniJavaVar mockVar(MiniJavaVar original) {
+        if(original.type.equals("boolean")) return MiniJavaVar.makeBool(true);
+        if(original.type.equals("int")) return MiniJavaVar.makeInt(1);
+        return original;
+    }
 
     protected boolean isArrayType(ParserRuleContext ctx, String type) {
         if(!type.endsWith("[]")) {
@@ -66,13 +77,33 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return MiniJavaVar.makeError();
     }
 
-    protected MiniJavaClass findDefinedClass(ParserRuleContext ctx, String className) {
+    protected MiniJavaClass classFoundOrNot(ParserRuleContext ctx, String className) {
         MiniJavaClass res = classes.get(className);
+        if(className.equals(mainClassName)) {
+            CliUtil.err(ctx, "refer to mainClass is not supported yet.");
+            hasSyntaxError = true;
+            return null;
+        }
         if(res == null) {
             CliUtil.err(ctx, "undefined class " + className);
             hasSyntaxError = true;
         }
         return res;
+    }
+
+    protected MiniJavaParser.MethodDeclarationContext methodFoundOrNot(ParserRuleContext ctx, MiniJavaClass klass, String methodName) {
+        MiniJavaParser.MethodDeclarationContext findRes = null;
+        if(klass == null) {
+            // main class
+            if(methodName.equals("main")) return null;
+        } else {
+            findRes = klass.methods.get(methodName);
+        }
+        if(findRes == null) {
+            CliUtil.err(ctx, String.format("Method '%s' not found.", methodName));
+            hasSyntaxError = true;
+        }
+        return findRes;
     }
 
     protected MiniJavaVar idFoundOrNot(ParserRuleContext ctx, MiniJavaVarCtxManager varCtx, String id) {
@@ -85,22 +116,13 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return findRes;
     }
 
-    protected MiniJavaParser.MethodDeclarationContext methodFoundOrNot(ParserRuleContext ctx, MiniJavaClass klass, String methodName) {
-        MiniJavaParser.MethodDeclarationContext findRes = klass.methods.get(methodName);
-        if(findRes == null) {
-            CliUtil.err(ctx, String.format("Method '%s' not found.", methodName));
-            hasSyntaxError = true;
-        }
-        return findRes;
-    }
-
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         currentClassName = ctx.className.getText();
-        currentClass = findDefinedClass(ctx, currentClassName);
-        assert (currentClass != null); // all classes should have been collected in collector
+        currentClass = classFoundOrNot(ctx, currentClassName);
+        assert (currentClass != null); // all classes except mainClass should have been collected in collector
 
         if(currentClass.parentClassName != null) {
-            if(findDefinedClass(ctx, currentClass.parentClassName) == null) {
+            if(classFoundOrNot(ctx, currentClass.parentClassName) == null) {
                 hasSyntaxError = true;
                 currentClass = null;
                 currentClassName = null;
@@ -119,6 +141,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitMainClass(MiniJavaParser.MainClassContext ctx) {
         currentClassName = ctx.className.getText();
+        mainClassName = currentClassName;
         currentClass = null;
 
         varCtx.enterBlock();
@@ -132,7 +155,10 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
-        return Eval.visitVarDeclaration(ctx, varCtx);
+        String varName = ctx.ID().getText();
+        String varType = ctx.type().getText();
+        varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
+        return MiniJavaVar.makeVoid();
     }
 
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
@@ -182,12 +208,13 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitReturn(MiniJavaParser.ReturnContext ctx) {
         MiniJavaParser.MethodDeclarationContext currentMethod;
-        currentMethod = SyntaxChecker.getMethodContext(classes, currentClassName, currentMethodName);
+        currentMethod = methodFoundOrNot(ctx, currentClass, currentMethodName);
         String retType = "void";
         if(currentMethod == null && !currentMethodName.equals("main")) {
-            assert (false);
+            assert(false);
         }
         if(currentMethod != null) {
+            // not main method of main class
             retType = currentMethod.returnType.getText();
         }
 
@@ -228,9 +255,27 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return opNotImplemented(ctx, assignSym);
     }
 
+    public static MiniJavaVar systemCall(MiniJavaParser.SystemCallContext ctx, MiniJavaVar a, boolean doNotExec) {
+        if(a.isError()) return a;
+        if(a.type.equals("int")) {
+            if(!doNotExec) System.out.println(a.value);
+            return MiniJavaVar.makeVoid();
+        }
+        if(a.type.equals("boolean")) {
+            if(!doNotExec) System.out.println(a.value != 0);
+            return MiniJavaVar.makeVoid();
+        }
+        if(a.type.equals("int[]")) {
+            if(!doNotExec) System.out.println("println: int[] is not supported yet.");
+            return MiniJavaVar.makeVoid();
+        }
+        CliUtil.err(ctx, String.format("System.out.println: type '%s' is not supported.", a.type));
+        return MiniJavaVar.makeError();
+    }
+
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
-        return SyntaxChecker.println(ctx, v) ? MiniJavaVar.makeError() : MiniJavaVar.makeVoid();
+        return systemCall(ctx, v, true);
     }
 
     @Override public MiniJavaVar visitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx) {
@@ -246,18 +291,18 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         MiniJavaVar v = visit(ctx.v);
         if(v.isError()) return v;
-        if(!matchType(ctx, v.type, SyntaxChecker.getElementType(findRes.type)))
+        if(!matchType(ctx, v.type, getElementType(findRes.type)))
             return MiniJavaVar.makeError();
 
         return MiniJavaVar.makeVoid();
     }
 
     @Override public MiniJavaVar visitBoolLiteral(MiniJavaParser.BoolLiteralContext ctx) {
-        return SyntaxChecker.mockVar(MiniJavaVar.makeInit("boolean"));
+        return mockVar(MiniJavaVar.makeInit("boolean"));
     }
 
     @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {
-        return SyntaxChecker.mockVar(MiniJavaVar.makeInit("int"));
+        return mockVar(MiniJavaVar.makeInit("int"));
     }
 
     @Override public MiniJavaVar visitThis(MiniJavaParser.ThisContext ctx) {
@@ -274,7 +319,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitNewExp(MiniJavaParser.NewExpContext ctx) {
         String className = ctx.ID().getText();
-        MiniJavaClass res = findDefinedClass(ctx, className);
+        MiniJavaClass res = classFoundOrNot(ctx, className);
         if(res == null) return MiniJavaVar.makeError();
         return MiniJavaVar.makeInit(className);
     }
@@ -293,7 +338,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(idx.isError()) return idx;
         if(!matchType(ctx, idx.type, "int")) return MiniJavaVar.makeError();
 
-        return MiniJavaVar.makeInit(SyntaxChecker.getElementType(id.type));
+        return MiniJavaVar.makeInit(getElementType(id.type));
     }
 
     @Override public MiniJavaVar visitGetLength(MiniJavaParser.GetLengthContext ctx) {
@@ -313,13 +358,19 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaClass klass;
 
         if(id.type.equals("0this")) {
-            assert (currentClass != null);  // is null when in main class
+            if(currentClass == null) {
+                // is null when in main class
+                CliUtil.err(ctx, "calling 'this' in mainClass is not supported yet.");
+                hasSyntaxError = true;
+                return MiniJavaVar.makeError();
+            }
             klass = currentClass;
         } else {
-            klass = findDefinedClass(ctx, id.type);
+            klass = classFoundOrNot(ctx, id.type);
             if(klass == null) return MiniJavaVar.makeError();
         }
 
+        // now klass must be not null
         // TODO: find in parent class
         MiniJavaParser.MethodDeclarationContext method = methodFoundOrNot(ctx, klass, methodName);
         if(method == null)
@@ -374,20 +425,20 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
-        MiniJavaVar first = SyntaxChecker.mockVar(visit(ctx.first));
+        MiniJavaVar first = mockVar(visit(ctx.first));
         return unaryOp(ctx, first);
     }
 
     @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
-        MiniJavaVar first = SyntaxChecker.mockVar(visit(ctx.first));
-        MiniJavaVar second = SyntaxChecker.mockVar(visit(ctx.second));
+        MiniJavaVar first = mockVar(visit(ctx.first));
+        MiniJavaVar second = mockVar(visit(ctx.second));
         return binaryOp(ctx, first, second);
     }
 
     @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {
-        MiniJavaVar first = SyntaxChecker.mockVar(visit(ctx.first));
-        MiniJavaVar second = SyntaxChecker.mockVar(visit(ctx.second));
-        MiniJavaVar third = SyntaxChecker.mockVar(visit(ctx.third));
+        MiniJavaVar first = mockVar(visit(ctx.first));
+        MiniJavaVar second = mockVar(visit(ctx.second));
+        MiniJavaVar third = mockVar(visit(ctx.third));
         return ternaryOp(ctx, first, second, third);
     }
 
