@@ -269,11 +269,11 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     public static MiniJavaVar systemCall(MiniJavaParser.SystemCallContext ctx, MiniJavaVar a, boolean doNotExec) {
         if(a.isError()) return a;
         if(a.type.equals("int")) {
-            if(!doNotExec) System.out.println(a.value);
+            if(!doNotExec) System.out.println((int)a.value);
             return MiniJavaVar.makeVoid();
         }
         if(a.type.equals("boolean")) {
-            if(!doNotExec) System.out.println(a.value != 0);
+            if(!doNotExec) System.out.println((boolean)a.value);
             return MiniJavaVar.makeVoid();
         }
         if(a.type.equals("int[]")) {
