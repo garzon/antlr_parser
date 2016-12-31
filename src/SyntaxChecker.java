@@ -9,54 +9,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class SyntaxChecker {
 
-    public static boolean isArrayType(ParserRuleContext ctx, String type) {
-        if(!type.endsWith("[]")) {
-            CliUtil.err(ctx, String.format("Type error: Array expected, got '%s'", type));
-            return false;
-        }
-        return true;
-    }
-
     public static String getElementType(String arrType) {
         assert (arrType.endsWith("[]"));
         return arrType.substring(0, arrType.length() - 2);
-    }
-
-    public static boolean matchType(ParserRuleContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
-            CliUtil.err(ctx, String.format("Type error: '%s' expected, got '%s'", type2, type1));
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean checkOprType(MiniJavaParser.BinaryOpContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
-            CliUtil.err(ctx, String.format("binaryOp '%s': operand type '%s' not match '%s'", ctx.op.getText(), type1, type2));
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean checkUnaryOprType(MiniJavaParser.UnaryOpContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
-            CliUtil.err(ctx, String.format("unaryOp '%s': unexpected type '%s', '%s' expected", ctx.op.getText(), ctx.getText(), type1, type2));
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean checkAssignOprType(MiniJavaParser.AssignContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
-            CliUtil.err(ctx, String.format("Assignment '%s': unexpected type '%s', '%s' expected", ctx.assignSym().getText(), type1, type2));
-            return false;
-        }
-        return true;
-    }
-
-    public static MiniJavaVar opNotImplemented(ParserRuleContext ctx, String op) {
-        CliUtil.err(ctx, String.format("Op %s is not implemented yet", op));
-        return MiniJavaVar.makeError();
     }
 
     public static MiniJavaVar mockVar(MiniJavaVar original) {
@@ -74,23 +29,5 @@ public class SyntaxChecker {
         assert (foundClass != null);
         MiniJavaParser.MethodDeclarationContext res = foundClass.methods.get(methodName);
         return res;
-    }
-
-    public static MiniJavaVar unaryOp(MiniJavaParser.UnaryOpContext ctx, MiniJavaVar first) {
-        first = mockVar(first);
-        return Eval.unaryOp(ctx, first);
-    }
-
-    public static MiniJavaVar binaryOp(MiniJavaParser.BinaryOpContext ctx, MiniJavaVar first, MiniJavaVar second) {
-        first = mockVar(first);
-        second = mockVar(second);
-        return Eval.binaryOp(ctx, first, second);
-    }
-
-    public static MiniJavaVar ternaryOp(MiniJavaParser.TernaryOpContext ctx, MiniJavaVar first, MiniJavaVar second, MiniJavaVar third) {
-        first = mockVar(first);
-        second = mockVar(second);
-        third = mockVar(third);
-        return Eval.ternaryOp(ctx, first, second, third);
     }
 }

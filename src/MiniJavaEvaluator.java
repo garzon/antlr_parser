@@ -7,9 +7,7 @@ import miniJava.*;
  * Created by ougar_000 on 2016/12/30.
  */
 
-public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
-    private MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
-    public HashMap<String, MiniJavaClass> classesInfo;
+public class MiniJavaEvaluator extends MiniJavaTypeChecker {
 
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
         varCtx.enterBlock();
@@ -53,10 +51,10 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
 
-        if(!SyntaxChecker.checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
+        if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
         if(assignSym.equals("=")) return varCtx.assignVar(id, v);
 
-        if(!SyntaxChecker.checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
+        if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
         if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }
         if(assignSym.equals("/=")) { findRes.value = (int)findRes.value / (int)v.value; return findRes; }
         if(assignSym.equals("%=")) { findRes.value = (int)findRes.value % (int)v.value; return findRes; }
@@ -75,13 +73,13 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
         MiniJavaVar res = visit(ctx.first);
-        return Eval.unaryOp(ctx, res);
+        return unaryOp(ctx, res);
     }
 
     @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
         MiniJavaVar first = visit(ctx.first);
         MiniJavaVar second = visit(ctx.second);
-        return Eval.binaryOp(ctx, first, second);
+        return binaryOp(ctx, first, second);
     }
 
     @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {

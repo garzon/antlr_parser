@@ -8,13 +8,6 @@ import miniJava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class Eval {
-    private static boolean divBy0(MiniJavaParser.BinaryOpContext ctx, int vNotZero) {
-        if(vNotZero == 0) {
-            CliUtil.err(ctx, String.format("Op '%s': divided by zero", ctx.op.getText()));
-            return true;
-        }
-        return false;
-    }
 
     public static MiniJavaVar idFoundOrNot(ParserRuleContext ctx, MiniJavaVarCtxManager varCtx, String id) {
         MiniJavaVar findRes = varCtx.findVar(id);
@@ -41,11 +34,6 @@ public class Eval {
         return MiniJavaVar.makeVoid();
     }
 
-    public static MiniJavaVar visitIf(MiniJavaParser.IfContext ctx, MiniJavaVar v) {
-        if(!SyntaxChecker.matchType(ctx, v.type, "boolean")) return MiniJavaVar.makeError();
-        return v;
-    }
-
     public static MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx, MiniJavaVar a, boolean doNotPrint) {
         if(a.isError()) return a;
         if(a.type.equals("int")) {
@@ -68,119 +56,5 @@ public class Eval {
         return visitSystemCall(ctx, a, false);
     }
 
-    public static MiniJavaVar unaryOp(MiniJavaParser.UnaryOpContext ctx, MiniJavaVar res) {
-        if(res.isError()) return res;
-        String type = res.type;
-        switch (ctx.op.getText().charAt(0)) {
-            case '!':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "boolean")) return MiniJavaVar.makeError();
-                res.value = !(boolean)res.value;
-                break;
-            case '+':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
-                break;
-            case '-':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
-                res.value = -(int)res.value;
-                break;
-            case '~':
-                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
-                res.value = ~(int)res.value;
-                break;
-            default:
-                return SyntaxChecker.opNotImplemented(ctx, ctx.op.getText());
-        }
-        return res;
-    }
 
-    public static MiniJavaVar binaryOp(MiniJavaParser.BinaryOpContext ctx, MiniJavaVar first, MiniJavaVar second) {
-        if(first.isError()) return first;
-        if(second.isError()) return second;
-        String opSym = ctx.op.getText();
-
-        if(!SyntaxChecker.checkOprType(ctx, first.type, second.type)) return MiniJavaVar.makeError();
-
-        if(opSym.equals("==")) {
-            if(first.type.equals("int")) {
-                return MiniJavaVar.makeBool((int)first.value == (int)second.value);
-            }
-            if(first.type.equals("boolean")) {
-                return MiniJavaVar.makeBool((boolean)first.value == (boolean)second.value);
-            }
-            return SyntaxChecker.opNotImplemented(ctx, String.format("'%s' for type '%s'", opSym, first.type));
-        }
-        if(opSym.equals("!=")) {
-            if(first.type.equals("int")) {
-                return MiniJavaVar.makeBool((int)first.value != (int)second.value);
-            }
-            if(first.type.equals("boolean")) {
-                return MiniJavaVar.makeBool((boolean)first.value != (boolean)second.value);
-            }
-            return SyntaxChecker.opNotImplemented(ctx, String.format("'%s' for type '%s'", opSym, first.type));
-        }
-
-        if(opSym.equals("||")) {
-            if(!SyntaxChecker.checkOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
-            return MiniJavaVar.makeBool((boolean)first.value || (boolean)second.value);
-        }
-        if(opSym.equals("&&")) {
-            if(!SyntaxChecker.checkOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
-            return MiniJavaVar.makeBool((boolean)first.value && (boolean)second.value);
-        }
-
-        if(!SyntaxChecker.checkOprType(ctx, first.type, "int")) return MiniJavaVar.makeError();
-
-        if(opSym.equals("*"))
-            return MiniJavaVar.makeInt((int)first.value * (int)second.value);
-        if(opSym.equals("/")) {
-            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeError();
-            return MiniJavaVar.makeInt((int) first.value / (int)second.value);
-        }
-        if(opSym.equals("%")) {
-            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeError();
-            return MiniJavaVar.makeInt((int) first.value % (int) second.value);
-        }
-        if(opSym.equals("+"))
-            return MiniJavaVar.makeInt((int)first.value + (int)second.value);
-        if(opSym.equals("-"))
-            return MiniJavaVar.makeInt((int)first.value - (int)second.value);
-        if(opSym.equals("<<"))
-            return MiniJavaVar.makeInt((int)first.value << (int)second.value);
-        if(opSym.equals(">>>"))
-            return MiniJavaVar.makeInt((int)first.value >>> (int)second.value);
-        if(opSym.equals(">>"))
-            return MiniJavaVar.makeInt((int)first.value >> (int)second.value);
-        if(opSym.equals("<"))
-            return MiniJavaVar.makeBool((int)first.value < (int)second.value);
-        if(opSym.equals("<="))
-            return MiniJavaVar.makeBool((int)first.value <= (int)second.value);
-        if(opSym.equals(">"))
-            return MiniJavaVar.makeBool((int)first.value > (int)second.value);
-        if(opSym.equals(">="))
-            return MiniJavaVar.makeBool((int)first.value >= (int)second.value);
-        if(opSym.equals("^"))
-            return MiniJavaVar.makeInt((int)first.value ^ (int)second.value);
-        if(opSym.equals("|"))
-            return MiniJavaVar.makeInt((int)first.value | (int)second.value);
-        if(opSym.equals("&"))
-            return MiniJavaVar.makeInt((int)first.value & (int)second.value);
-
-        return SyntaxChecker.opNotImplemented(ctx, opSym);
-    }
-
-    public static MiniJavaVar ternaryOp(MiniJavaParser.TernaryOpContext ctx, MiniJavaVar first, MiniJavaVar second, MiniJavaVar third) {
-        if(first.isError()) return first;
-        if(second.isError()) return second;
-        if(third.isError()) return third;
-
-        String opSym = ctx.op.getText();
-        if(opSym.equals("?")) {
-            if(!SyntaxChecker.matchType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
-            if(!SyntaxChecker.matchType(ctx, second.type, third.type)) return MiniJavaVar.makeError();
-            if((boolean)first.value) return second;
-            else return third;
-        }
-
-        return SyntaxChecker.opNotImplemented(ctx, opSym);
-    }
 }

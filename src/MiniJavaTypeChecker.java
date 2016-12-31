@@ -11,11 +11,62 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     public boolean hasSyntaxError = false;
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
 
-    private String currentClassName, currentMethodName;
-    private MiniJavaClass currentClass;
-    private MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
+    protected String currentClassName, currentMethodName;
+    protected MiniJavaClass currentClass;
+    protected MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
 
-    private MiniJavaClass findDefinedClass(ParserRuleContext ctx, String className) {
+    protected boolean isArrayType(ParserRuleContext ctx, String type) {
+        if(!type.endsWith("[]")) {
+            CliUtil.err(ctx, String.format("Type error: Array expected, got '%s'", type));
+            hasSyntaxError = true;
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean matchType(ParserRuleContext ctx, String type1, String type2) {
+        if(!type1.equals(type2)) {
+            CliUtil.err(ctx, String.format("Type error: '%s' expected, got '%s'", type2, type1));
+            hasSyntaxError = true;
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean checkUnaryOprType(MiniJavaParser.UnaryOpContext ctx, String type1, String type2) {
+        if(!type1.equals(type2)) {
+            CliUtil.err(ctx, String.format("unaryOp '%s': unexpected type '%s', '%s' expected", ctx.op.getText(), ctx.getText(), type1, type2));
+            hasSyntaxError = true;
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean checkAssignOprType(MiniJavaParser.AssignContext ctx, String type1, String type2) {
+        if(!type1.equals(type2)) {
+            CliUtil.err(ctx, String.format("Assignment '%s': unexpected type '%s', '%s' expected", ctx.assignSym().getText(), type1, type2));
+            hasSyntaxError = true;
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean checkBinaryOprType(MiniJavaParser.BinaryOpContext ctx, String type1, String type2) {
+        if(!type1.equals(type2)) {
+            CliUtil.err(ctx, String.format("binaryOp '%s': operand type '%s' not match '%s'", ctx.op.getText(), type1, type2));
+            hasSyntaxError = true;
+            return false;
+        }
+        return true;
+    }
+
+    protected MiniJavaVar opNotImplemented(ParserRuleContext ctx, String op) {
+        CliUtil.err(ctx, String.format("Op %s is not implemented yet", op));
+        hasSyntaxError = true;
+        return MiniJavaVar.makeError();
+    }
+
+    protected MiniJavaClass findDefinedClass(ParserRuleContext ctx, String className) {
         MiniJavaClass res = classes.get(className);
         if(res == null) {
             CliUtil.err(ctx, "undefined class " + className);
@@ -32,7 +83,6 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(currentClass.parentClassName != null) {
             if(findDefinedClass(ctx, currentClass.parentClassName) == null) {
                 hasSyntaxError = true;
-                //CliUtil.err(ctx, String.format("parent class '%s' undefined.", currentClass.parentClassName));
                 currentClass = null;
                 currentClassName = null;
                 return MiniJavaVar.makeError();
@@ -98,8 +148,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitIf(MiniJavaParser.IfContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return MiniJavaVar.makeError();
-        MiniJavaVar criteria = Eval.visitIf(ctx, v);
-        if(criteria.isError()) return MiniJavaVar.makeError();
+        if(!matchType(ctx, v.type, "boolean")) return MiniJavaVar.makeError();
 
         MiniJavaVar ts = visit(ctx.t_stmt);
         MiniJavaVar fs = ctx.f_stmt == null ? MiniJavaVar.makeVoid() : visit(ctx.f_stmt);
@@ -125,7 +174,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
-        if(!SyntaxChecker.matchType(ctx, v.type, retType)) return MiniJavaVar.makeError();
+        if(!matchType(ctx, v.type, retType)) return MiniJavaVar.makeError();
         return MiniJavaVar.makeVoid();
     }
 
@@ -142,10 +191,10 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
 
-        if(!SyntaxChecker.checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
+        if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
         if(assignSym.equals("=")) return MiniJavaVar.makeVoid();
 
-        if(!SyntaxChecker.checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
+        if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
         if(assignSym.equals("*=") ||
             assignSym.equals("/=") ||
             assignSym.equals("%=") ||
@@ -160,7 +209,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             return MiniJavaVar.makeVoid();
         }
 
-        return SyntaxChecker.opNotImplemented(ctx, assignSym);
+        return opNotImplemented(ctx, assignSym);
     }
 
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
@@ -176,36 +225,18 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             hasSyntaxError = true;
             return MiniJavaVar.makeError();
         }
-        if(!SyntaxChecker.isArrayType(ctx, findRes.type)) return MiniJavaVar.makeError();
+        if(!isArrayType(ctx, findRes.type)) return MiniJavaVar.makeError();
 
         MiniJavaVar idx = visit(ctx.idx);
         if(idx.isError()) return idx;
-        if(!SyntaxChecker.matchType(ctx, idx.type, "int")) return MiniJavaVar.makeError();
+        if(!matchType(ctx, idx.type, "int")) return MiniJavaVar.makeError();
 
         MiniJavaVar v = visit(ctx.v);
         if(v.isError()) return v;
-        if(!SyntaxChecker.matchType(ctx, v.type, SyntaxChecker.getElementType(findRes.type)))
+        if(!matchType(ctx, v.type, SyntaxChecker.getElementType(findRes.type)))
             return MiniJavaVar.makeError();
 
         return MiniJavaVar.makeVoid();
-    }
-
-    @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
-        MiniJavaVar first = visit(ctx.first);
-        return SyntaxChecker.unaryOp(ctx, first);
-    }
-
-    @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
-        MiniJavaVar first = visit(ctx.first);
-        MiniJavaVar second = visit(ctx.second);
-        return SyntaxChecker.binaryOp(ctx, first, second);
-    }
-
-    @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {
-        MiniJavaVar first = visit(ctx.first);
-        MiniJavaVar second = visit(ctx.second);
-        MiniJavaVar third = visit(ctx.third);
-        return SyntaxChecker.ternaryOp(ctx, first, second, third);
     }
 
     @Override public MiniJavaVar visitBoolLiteral(MiniJavaParser.BoolLiteralContext ctx) {
@@ -223,7 +254,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitNewArr(MiniJavaParser.NewArrContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
-        if(!SyntaxChecker.matchType(ctx, v.type, "int")) return MiniJavaVar.makeError();
+        if(!matchType(ctx, v.type, "int")) return MiniJavaVar.makeError();
 
         return MiniJavaVar.makeInit(ctx.basicType().getText() + "[]");
     }
@@ -244,14 +275,12 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitIndexOf(MiniJavaParser.IndexOfContext ctx) {
         MiniJavaVar id = visit(ctx.id);
         if(id.isError()) return id;
-        if(!SyntaxChecker.isArrayType(ctx, id.type)) {
-            hasSyntaxError = true;
-            return MiniJavaVar.makeError();
-        }
+        if(!isArrayType(ctx, id.type)) return MiniJavaVar.makeError();
+
 
         MiniJavaVar idx = visit(ctx.idx);
         if(idx.isError()) return idx;
-        if(!SyntaxChecker.matchType(ctx, idx.type, "int")) return MiniJavaVar.makeError();
+        if(!matchType(ctx, idx.type, "int")) return MiniJavaVar.makeError();
 
         return MiniJavaVar.makeInit(SyntaxChecker.getElementType(id.type));
     }
@@ -259,10 +288,8 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitGetLength(MiniJavaParser.GetLengthContext ctx) {
         MiniJavaVar id = visit(ctx.id);
         if(id.isError()) return id;
-        if(!SyntaxChecker.isArrayType(ctx, id.type)) {
-            hasSyntaxError = true;
+        if(!isArrayType(ctx, id.type))
             return MiniJavaVar.makeError();
-        }
 
         return MiniJavaVar.makeInit("int");
     }
@@ -319,14 +346,155 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
                 continue;
             }
             MiniJavaVar arg = visit(exp);
-            if(!SyntaxChecker.matchType(exp, arg.type, args.get(i-1))) {
-                hasSyntaxError = true;
+            if(!matchType(exp, arg.type, args.get(i-1)))
                 return MiniJavaVar.makeError();
-            }
             i += 1;
         }
 
         String retType = method.returnType.getText();
         return MiniJavaVar.makeInit(retType);
+    }
+
+    private boolean divBy0(MiniJavaParser.BinaryOpContext ctx, int vNotZero) {
+        if(vNotZero == 0) {
+            CliUtil.err(ctx, String.format("Op '%s': divided by zero", ctx.op.getText()));
+            hasSyntaxError = true;
+            return true;
+        }
+        return false;
+    }
+
+    @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
+        MiniJavaVar first = SyntaxChecker.mockVar(visit(ctx.first));
+        return unaryOp(ctx, first);
+    }
+
+    @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
+        MiniJavaVar first = SyntaxChecker.mockVar(visit(ctx.first));
+        MiniJavaVar second = SyntaxChecker.mockVar(visit(ctx.second));
+        return binaryOp(ctx, first, second);
+    }
+
+    @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {
+        MiniJavaVar first = SyntaxChecker.mockVar(visit(ctx.first));
+        MiniJavaVar second = SyntaxChecker.mockVar(visit(ctx.second));
+        MiniJavaVar third = SyntaxChecker.mockVar(visit(ctx.third));
+        return ternaryOp(ctx, first, second, third);
+    }
+
+    protected MiniJavaVar unaryOp(MiniJavaParser.UnaryOpContext ctx, MiniJavaVar res) {
+        if(res.isError()) return res;
+        String type = res.type;
+        switch (ctx.op.getText().charAt(0)) {
+            case '!':
+                if(!checkUnaryOprType(ctx, type, "boolean")) return MiniJavaVar.makeError();
+                res.value = !(boolean)res.value;
+                break;
+            case '+':
+                if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
+                break;
+            case '-':
+                if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
+                res.value = -(int)res.value;
+                break;
+            case '~':
+                if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
+                res.value = ~(int)res.value;
+                break;
+            default:
+                return opNotImplemented(ctx, ctx.op.getText());
+        }
+        return res;
+    }
+
+    protected MiniJavaVar binaryOp(MiniJavaParser.BinaryOpContext ctx, MiniJavaVar first, MiniJavaVar second) {
+        if(first.isError()) return first;
+        if(second.isError()) return second;
+        String opSym = ctx.op.getText();
+
+        if(!checkBinaryOprType(ctx, first.type, second.type)) return MiniJavaVar.makeError();
+
+        if(opSym.equals("==")) {
+            if(first.type.equals("int")) {
+                return MiniJavaVar.makeBool((int)first.value == (int)second.value);
+            }
+            if(first.type.equals("boolean")) {
+                return MiniJavaVar.makeBool((boolean)first.value == (boolean)second.value);
+            }
+            return opNotImplemented(ctx, String.format("'%s' for type '%s'", opSym, first.type));
+        }
+        if(opSym.equals("!=")) {
+            if(first.type.equals("int")) {
+                return MiniJavaVar.makeBool((int)first.value != (int)second.value);
+            }
+            if(first.type.equals("boolean")) {
+                return MiniJavaVar.makeBool((boolean)first.value != (boolean)second.value);
+            }
+            return opNotImplemented(ctx, String.format("'%s' for type '%s'", opSym, first.type));
+        }
+
+        if(opSym.equals("||")) {
+            if(!checkBinaryOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
+            return MiniJavaVar.makeBool((boolean)first.value || (boolean)second.value);
+        }
+        if(opSym.equals("&&")) {
+            if(!checkBinaryOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
+            return MiniJavaVar.makeBool((boolean)first.value && (boolean)second.value);
+        }
+
+        if(!checkBinaryOprType(ctx, first.type, "int")) return MiniJavaVar.makeError();
+
+        if(opSym.equals("*"))
+            return MiniJavaVar.makeInt((int)first.value * (int)second.value);
+        if(opSym.equals("/")) {
+            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeError();
+            return MiniJavaVar.makeInt((int) first.value / (int)second.value);
+        }
+        if(opSym.equals("%")) {
+            if(divBy0(ctx, (int)second.value)) return MiniJavaVar.makeError();
+            return MiniJavaVar.makeInt((int) first.value % (int) second.value);
+        }
+        if(opSym.equals("+"))
+            return MiniJavaVar.makeInt((int)first.value + (int)second.value);
+        if(opSym.equals("-"))
+            return MiniJavaVar.makeInt((int)first.value - (int)second.value);
+        if(opSym.equals("<<"))
+            return MiniJavaVar.makeInt((int)first.value << (int)second.value);
+        if(opSym.equals(">>>"))
+            return MiniJavaVar.makeInt((int)first.value >>> (int)second.value);
+        if(opSym.equals(">>"))
+            return MiniJavaVar.makeInt((int)first.value >> (int)second.value);
+        if(opSym.equals("<"))
+            return MiniJavaVar.makeBool((int)first.value < (int)second.value);
+        if(opSym.equals("<="))
+            return MiniJavaVar.makeBool((int)first.value <= (int)second.value);
+        if(opSym.equals(">"))
+            return MiniJavaVar.makeBool((int)first.value > (int)second.value);
+        if(opSym.equals(">="))
+            return MiniJavaVar.makeBool((int)first.value >= (int)second.value);
+        if(opSym.equals("^"))
+            return MiniJavaVar.makeInt((int)first.value ^ (int)second.value);
+        if(opSym.equals("|"))
+            return MiniJavaVar.makeInt((int)first.value | (int)second.value);
+        if(opSym.equals("&"))
+            return MiniJavaVar.makeInt((int)first.value & (int)second.value);
+
+        return opNotImplemented(ctx, opSym);
+    }
+
+    protected MiniJavaVar ternaryOp(MiniJavaParser.TernaryOpContext ctx, MiniJavaVar first, MiniJavaVar second, MiniJavaVar third) {
+        if(first.isError()) return first;
+        if(second.isError()) return second;
+        if(third.isError()) return third;
+
+        String opSym = ctx.op.getText();
+        if(opSym.equals("?")) {
+            if(!matchType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
+            if(!matchType(ctx, second.type, third.type)) return MiniJavaVar.makeError();
+            if((boolean)first.value) return second;
+            else return third;
+        }
+
+        return opNotImplemented(ctx, opSym);
     }
 }

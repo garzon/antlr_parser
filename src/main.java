@@ -50,7 +50,7 @@ public class main {
 
         //if(args.length > 2 && args[1].equals("run")) {
             MiniJavaEvaluator evaluator = new MiniJavaEvaluator();
-            evaluator.classesInfo = collector.classes;
+            evaluator.classes = collector.classes;
             evaluator.visit(root.mainClass());
         //} else {
             System.out.println(root.toStringTree(parser));
