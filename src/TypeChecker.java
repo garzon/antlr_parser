@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by ougar_000 on 2016/12/30.
  */
-public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
+public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     public boolean hasSyntaxError = false;
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
 

@@ -1,5 +1,4 @@
 import java.lang.*;
-import java.util.HashMap;
 
 import miniJava.*;
 
@@ -7,7 +6,7 @@ import miniJava.*;
  * Created by ougar_000 on 2016/12/30.
  */
 
-public class MiniJavaEvaluator extends MiniJavaTypeChecker {
+public class Evaluator extends TypeChecker {
 
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
         varCtx.enterBlock();

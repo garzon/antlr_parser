@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Created by ougar_000 on 2016/12/30.
  */
-public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
+public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
     public boolean hasSyntaxError = false;
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
 
