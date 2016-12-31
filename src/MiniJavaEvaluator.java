@@ -29,17 +29,15 @@ public class MiniJavaEvaluator extends MiniJavaTypeChecker {
 
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
         String id = ctx.ID().getText();
-        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes == null) return MiniJavaVar.makeError();
-        return findRes;
+        return idFoundOrNot(ctx, varCtx, id);
     }
 
     @Override public MiniJavaVar visitAssign(MiniJavaParser.AssignContext ctx) {
         String assignSym = ctx.assignSym().getText();
         String id = ctx.ID().getText();
 
-        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes == null) return MiniJavaVar.makeError();
+        MiniJavaVar findRes = idFoundOrNot(ctx, varCtx, id);
+        if(findRes.isError()) return findRes;
 
         if(!assignSym.equals("=")) {
             if(findRes.value == null) {

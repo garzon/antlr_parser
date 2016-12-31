@@ -75,6 +75,25 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return res;
     }
 
+    protected MiniJavaVar idFoundOrNot(ParserRuleContext ctx, MiniJavaVarCtxManager varCtx, String id) {
+        MiniJavaVar findRes = varCtx.findVar(id);
+        if(findRes == null) {
+            CliUtil.err(ctx, String.format("Identifier '%s' not found.", id));
+            hasSyntaxError = true;
+            return MiniJavaVar.makeError();
+        }
+        return findRes;
+    }
+
+    protected MiniJavaParser.MethodDeclarationContext methodFoundOrNot(ParserRuleContext ctx, MiniJavaClass klass, String methodName) {
+        MiniJavaParser.MethodDeclarationContext findRes = klass.methods.get(methodName);
+        if(findRes == null) {
+            CliUtil.err(ctx, String.format("Method '%s' not found.", methodName));
+            hasSyntaxError = true;
+        }
+        return findRes;
+    }
+
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         currentClassName = ctx.className.getText();
         currentClass = findDefinedClass(ctx, currentClassName);
@@ -182,11 +201,8 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         String assignSym = ctx.assignSym().getText();
         String id = ctx.ID().getText();
 
-        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes.isError()) {
-            hasSyntaxError = true;
-            return MiniJavaVar.makeError();
-        }
+        MiniJavaVar findRes = idFoundOrNot(ctx, varCtx, id);
+        if(findRes.isError()) return findRes;
 
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
@@ -220,11 +236,8 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx) {
         String id = ctx.ID().getText();
 
-        MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes.isError()) {
-            hasSyntaxError = true;
-            return MiniJavaVar.makeError();
-        }
+        MiniJavaVar findRes = idFoundOrNot(ctx, varCtx, id);
+        if(findRes.isError()) return findRes;
         if(!isArrayType(ctx, findRes.type)) return MiniJavaVar.makeError();
 
         MiniJavaVar idx = visit(ctx.idx);
@@ -267,9 +280,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
-        MiniJavaVar res = Eval.idFoundOrNot(ctx, varCtx, ctx.ID().getText());
-        if(res.isError()) hasSyntaxError = true;
-        return res;
+        return idFoundOrNot(ctx, varCtx, ctx.ID().getText());
     }
 
     @Override public MiniJavaVar visitIndexOf(MiniJavaParser.IndexOfContext ctx) {
@@ -310,11 +321,9 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         }
 
         // TODO: find in parent class
-        MiniJavaParser.MethodDeclarationContext method = Eval.methodFoundOrNot(ctx, klass, methodName);
-        if(method == null) {
-            hasSyntaxError = true;
+        MiniJavaParser.MethodDeclarationContext method = methodFoundOrNot(ctx, klass, methodName);
+        if(method == null)
             return MiniJavaVar.makeError();
-        }
 
         Vector<String> args = klass.methodArgs.get(methodName);
         assert (args != null);

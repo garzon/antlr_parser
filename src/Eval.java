@@ -9,24 +9,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 public class Eval {
 
-    public static MiniJavaVar idFoundOrNot(ParserRuleContext ctx, MiniJavaVarCtxManager varCtx, String id) {
-        MiniJavaVar findRes = varCtx.findVar(id);
-        if(findRes == null) {
-            CliUtil.err(ctx, String.format("Identifier '%s' not found.", id));
-            return MiniJavaVar.makeError();
-        }
-        return findRes;
-    }
-
-    public static MiniJavaParser.MethodDeclarationContext methodFoundOrNot(ParserRuleContext ctx, MiniJavaClass klass, String methodName) {
-        MiniJavaParser.MethodDeclarationContext findRes = klass.methods.get(methodName);
-        if(findRes == null) {
-            CliUtil.err(ctx, String.format("Method '%s' not found.", methodName));
-            return null;
-        }
-        return findRes;
-    }
-
     public static MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx, MiniJavaVarCtxManager varCtx) {
         String varName = ctx.ID().getText();
         String varType = ctx.type().getText();
