@@ -22,15 +22,20 @@ assignSym : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&='
     | '|=' | '^=' | '<<=' | '>>=' | '>>>='
 ;
 
+stmtBody : ID assignSym v=exp #assign
+    | ID '[' idx=exp ']' assignSym v=exp #setIndexOf
+    | exp #stmtExp
+    | 'return' exp #return
+;
+
 stmt : varDeclaration #var
     | stmtBlock #block
     | 'if' '(' exp ')' t_stmt=stmt ('else' f_stmt=stmt)? #if
     | 'while' '(' exp ')' stmt #while
+    | 'for' '(' st_stmt=stmt exp ';' end_stmt=stmtBody ')' body=stmt #for
     | systemCallName='System.out.println' '(' exp ')' ';' #systemCall
-    | 'return' exp ';' #return
-    | ID assignSym v=exp ';' #assign
-    | ID '[' idx=exp ']' assignSym v=exp ';' #setIndexOf
-    | exp ';' #stmtExp
+    | stmtBody ';' #normalStmt
+    | ';' #emptyStmt
 ;
 
 exp : intLiteral #literal

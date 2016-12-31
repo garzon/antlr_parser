@@ -148,6 +148,54 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitAssignSym(MiniJavaParser.AssignSymContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code assign}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssign(MiniJavaParser.AssignContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code assign}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssign(MiniJavaParser.AssignContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code setIndexOf}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterSetIndexOf(MiniJavaParser.SetIndexOfContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code setIndexOf}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code stmtExp}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterStmtExp(MiniJavaParser.StmtExpContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code stmtExp}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitStmtExp(MiniJavaParser.StmtExpContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code return}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturn(MiniJavaParser.ReturnContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code return}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturn(MiniJavaParser.ReturnContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code var}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
@@ -196,6 +244,18 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitWhile(MiniJavaParser.WhileContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code for}
+	 * labeled alternative in {@link MiniJavaParser#stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterFor(MiniJavaParser.ForContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code for}
+	 * labeled alternative in {@link MiniJavaParser#stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitFor(MiniJavaParser.ForContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code systemCall}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
@@ -208,53 +268,29 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitSystemCall(MiniJavaParser.SystemCallContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code return}
+	 * Enter a parse tree produced by the {@code normalStmt}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void enterReturn(MiniJavaParser.ReturnContext ctx);
+	void enterNormalStmt(MiniJavaParser.NormalStmtContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code return}
+	 * Exit a parse tree produced by the {@code normalStmt}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void exitReturn(MiniJavaParser.ReturnContext ctx);
+	void exitNormalStmt(MiniJavaParser.NormalStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code assign}
+	 * Enter a parse tree produced by the {@code emptyStmt}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void enterAssign(MiniJavaParser.AssignContext ctx);
+	void enterEmptyStmt(MiniJavaParser.EmptyStmtContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code assign}
+	 * Exit a parse tree produced by the {@code emptyStmt}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void exitAssign(MiniJavaParser.AssignContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code setIndexOf}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void enterSetIndexOf(MiniJavaParser.SetIndexOfContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code setIndexOf}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void exitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code stmtExp}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void enterStmtExp(MiniJavaParser.StmtExpContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code stmtExp}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void exitStmtExp(MiniJavaParser.StmtExpContext ctx);
+	void exitEmptyStmt(MiniJavaParser.EmptyStmtContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code binaryOp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.

@@ -6,8 +6,7 @@ Input program:
 ```java
 class MiniJava {
     public static void main(String[] args) {
-        Seq seq;
-        seq = new Seq();
+        Seq seq = new Seq();
         seq.make_fib(15);
         System.out.println(seq.get_fib(15));
     }

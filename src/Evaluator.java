@@ -41,6 +41,8 @@ public class Evaluator extends TypeChecker {
         varCtx.enterBlock();
         for(MiniJavaParser.StmtContext stmt: ctx.stmt()) {
             //System.out.println(stmt.getText());
+            // reminder: adding grammar and not implementing checker might cause NullPointerException here
+            // since you need to return something like MiniJavaVar.makeVoid() to indicate everything's fine
             if(visit(stmt).isError()) return MiniJavaVar.makeError();
             if(returnVal != null) {
                 varCtx.exitBlock();
@@ -139,6 +141,10 @@ public class Evaluator extends TypeChecker {
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
         return systemCall(ctx, v, false);
+    }
+
+    @Override public MiniJavaVar visitNormalStmt(MiniJavaParser.NormalStmtContext ctx) {
+        return super.visitNormalStmt(ctx);
     }
 
     private MiniJavaVar outOfRangeError(ParserRuleContext ctx) {

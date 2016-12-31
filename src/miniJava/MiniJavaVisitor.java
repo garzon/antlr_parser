@@ -95,6 +95,34 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssignSym(MiniJavaParser.AssignSymContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code assign}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssign(MiniJavaParser.AssignContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code setIndexOf}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code stmtExp}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStmtExp(MiniJavaParser.StmtExpContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code return}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturn(MiniJavaParser.ReturnContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code var}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
@@ -123,6 +151,13 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitWhile(MiniJavaParser.WhileContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code for}
+	 * labeled alternative in {@link MiniJavaParser#stmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFor(MiniJavaParser.ForContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code systemCall}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
@@ -130,33 +165,19 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSystemCall(MiniJavaParser.SystemCallContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code return}
+	 * Visit a parse tree produced by the {@code normalStmt}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitReturn(MiniJavaParser.ReturnContext ctx);
+	T visitNormalStmt(MiniJavaParser.NormalStmtContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code assign}
+	 * Visit a parse tree produced by the {@code emptyStmt}
 	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAssign(MiniJavaParser.AssignContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code setIndexOf}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code stmtExp}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitStmtExp(MiniJavaParser.StmtExpContext ctx);
+	T visitEmptyStmt(MiniJavaParser.EmptyStmtContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code binaryOp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.

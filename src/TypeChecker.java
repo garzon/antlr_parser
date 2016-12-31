@@ -303,6 +303,10 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return systemCall(ctx, v, true);
     }
 
+    @Override public MiniJavaVar visitNormalStmt(MiniJavaParser.NormalStmtContext ctx) {
+        return visit(ctx.stmtBody());
+    }
+
     @Override public MiniJavaVar visitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx) {
         String id = ctx.ID().getText();
 
