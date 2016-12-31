@@ -6,4 +6,8 @@ import java.util.*;
 
 public class MiniJavaVarCtx {
     public HashMap<String, MiniJavaVar> vars = new HashMap<>();
+
+    public String toString() {
+        return vars.toString();
+    }
 }

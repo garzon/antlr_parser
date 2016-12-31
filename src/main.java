@@ -50,7 +50,7 @@ public class main {
         //if(args.length > 2 && args[1].equals("run")) {
             Evaluator evaluator = new Evaluator();
             evaluator.classes = collector.classes;
-            evaluator.visit(root.mainClass());
+            if(evaluator.visit(root.mainClass()).isError()) System.err.println("Runtime Error");
         //} else {
             System.out.println(root.toStringTree(parser));
         //}

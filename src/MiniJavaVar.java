@@ -34,4 +34,8 @@ public class MiniJavaVar {
     public static MiniJavaVar makeError() { return new MiniJavaVar("0Error", 0); }
 
     public static MiniJavaVar makeInit(String type) { return new MiniJavaVar(type, null); }
+
+    public String toString() {
+        return String.format("%s(%s)", type, value);
+    }
 }

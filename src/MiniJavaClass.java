@@ -15,6 +15,11 @@ public class MiniJavaClass {
     public HashMap<String, Vector<String>> methodArgsName = new HashMap<>();
 
     public String parentClassName = null;
+    public String name = null;
 
     public MiniJavaParser.ClassDeclarationContext ctx;
+
+    public String toString() {
+        return String.format("class(%s)", name);
+    }
 }

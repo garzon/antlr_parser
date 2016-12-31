@@ -26,6 +26,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         currentClassName = ctx.className.getText();
         currentClass = new MiniJavaClass();
+        currentClass.name = currentClassName;
 
         if(checkRedefinedClass(ctx)) return MiniJavaVar.makeError();
 

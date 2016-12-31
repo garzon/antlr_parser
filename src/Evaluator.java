@@ -16,6 +16,7 @@ public class Evaluator extends TypeChecker {
     private MiniJavaVar thisVal = null;
 
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
+        assert (false);
         return super.visitClassDeclaration(ctx);
     }
 
@@ -225,7 +226,7 @@ public class Evaluator extends TypeChecker {
 
         MiniJavaInstance inst = new MiniJavaInstance();
         inst.klass = res;
-        if(addPropertyOfClass(ctx, res, inst) != null) return MiniJavaVar.makeError();
+        if(addPropertyOfClass(ctx, res, inst).isError()) return MiniJavaVar.makeError();
 
         v.value = inst;
         return v;
@@ -324,8 +325,16 @@ public class Evaluator extends TypeChecker {
             i += 1;
         }
 
+        // save context
         MiniJavaVarCtxManager savedCtx = varCtx;
+        String _currentClassName = currentClassName, _currentMethodName = currentMethodName;
+        MiniJavaClass _currentClass = currentClass;
+        MiniJavaVar _thisVal = thisVal;
 
+        // make new context
+        currentClass = klass;
+        currentClassName = klass.name;
+        thisVal = id;
         varCtx = new MiniJavaVarCtxManager();
         assert (id.value instanceof MiniJavaInstance);
         varCtx.createInstanceCtx((MiniJavaInstance)id.value);
@@ -333,12 +342,20 @@ public class Evaluator extends TypeChecker {
         for(i = 0; i < n; i++) {
             varCtx.assignVar(argsName.get(i), calculatedArgs.get(i));
         }
-        MiniJavaVar ret = visit(method);
-        varCtx.exitBlock();
+        //System.out.printf("calling %s with ", methodName);System.out.println(calculatedArgs);
 
+        // calling function
+        MiniJavaVar ret = visit(method);
+
+        // recover context
+        varCtx.exitBlock();
         MiniJavaVar res = returnVal;
         returnVal = null;
         varCtx = savedCtx;
+        currentClassName = _currentClassName;
+        currentMethodName = _currentMethodName;
+        currentClass = _currentClass;
+        thisVal = _thisVal;
 
         if(ret.isError()) return MiniJavaVar.makeError();
 
