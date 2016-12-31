@@ -12,7 +12,9 @@ permissionDesc : 'public' | 'private' ;
 argPair : type ID ;
 methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (argPair (',' argPair)* )? ')' stmtBlock ;
 
-type : 'int' '[' ']' | 'boolean' | 'int' | ID ;
+type : arrType | basicType ;
+arrType : basicType '[' ']' ;
+basicType : 'boolean' | 'int' | ID ;
 
 stmtBlock : '{' (stmt)* '}' ;
 
@@ -31,11 +33,15 @@ stmt : varDeclaration #var
 ;
 
 exp : intLiteral #literal
-    | ID #id
+    | boolLiteral #literal
     | '(' exp ')' #dummy
+
+    | ID #id
+
     | id=exp '[' idx=exp ']' #indexOf
-    | id=exp '.' 'length' #getLength
     | id=exp '.' ID '(' (exp (',' exp)* )? ')' #getMethod
+    | id=exp '.' 'length' #getLength
+
     | op=('!' | '+' | '-' | '~') first=exp #unaryOp
     | first=exp op=('*' | '/' | '%') second=exp #binaryOp
     | first=exp op=('+' | '-') second=exp #binaryOp
@@ -48,9 +54,9 @@ exp : intLiteral #literal
     | first=exp op='&&' second=exp #binaryOp
     | first=exp op='||' second=exp #binaryOp
     | first=exp op='?' second=exp ':' third=exp #ternaryOp
-    | boolLiteral #literal
+
     | 'this' #this
-    | 'new' 'int' '[' exp ']' #newIntArr
+    | 'new' basicType '[' exp ']' #newIntArr
     | 'new' ID '(' ')' #newExp
 ;
 

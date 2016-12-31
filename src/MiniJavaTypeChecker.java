@@ -186,4 +186,18 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar third = visit(ctx.third);
         return SyntaxChecker.ternaryOp(ctx, first, second, third);
     }
+
+    @Override public MiniJavaVar visitBoolLiteral(MiniJavaParser.BoolLiteralContext ctx) {
+        return SyntaxChecker.mockVar(MiniJavaVar.makeInit("boolean"));
+    }
+
+    @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {
+        return SyntaxChecker.mockVar(MiniJavaVar.makeInit("int"));
+    }
+
+    @Override public MiniJavaVar visitThis(MiniJavaParser.ThisContext ctx) {
+        return MiniJavaVar.makeInit("this");
+    }
+
+    @Override public MiniJavaVar visit
 }

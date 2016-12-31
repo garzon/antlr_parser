@@ -54,7 +54,7 @@ public class SyntaxChecker {
         return MiniJavaVar.makeRuntimeError();
     }
 
-    private static MiniJavaVar mockVar(MiniJavaVar original) {
+    public static MiniJavaVar mockVar(MiniJavaVar original) {
         if(original.type.equals("boolean")) return MiniJavaVar.makeBool(true);
         if(original.type.equals("int")) return MiniJavaVar.makeInt(1);
         return original;
