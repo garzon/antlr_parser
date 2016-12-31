@@ -78,13 +78,12 @@ public class Evaluator extends TypeChecker {
     }
 
     @Override public MiniJavaVar visitWhile(MiniJavaParser.WhileContext ctx) {
-        MiniJavaVar v = visit(ctx.exp());
-        if(v.isError()) {
-            return MiniJavaVar.makeError();
-        }
-        assert (matchType(ctx, v.type, "boolean"));
+        while(true) {
+            MiniJavaVar v = visit(ctx.exp());
+            if(v.isError()) return v;
+            assert (matchType(ctx, v.type, "boolean"));
 
-        while((boolean)v.value) {
+            if(!(boolean)v.value) break;
             if(visit(ctx.stmt()).isError()) return MiniJavaVar.makeError();
         }
         return  MiniJavaVar.makeVoid();
