@@ -72,9 +72,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     protected MiniJavaVar opNotImplemented(ParserRuleContext ctx, String op) {
-        CliUtil.err(ctx, String.format("Op %s is not implemented yet", op));
         hasSyntaxError = true;
-        return MiniJavaVar.makeError();
+        return CliUtil.err(ctx, String.format("Op %s is not implemented yet", op));
     }
 
     protected MiniJavaClass classFoundOrNot(ParserRuleContext ctx, String className) {
@@ -109,9 +108,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected MiniJavaVar idFoundOrNot(ParserRuleContext ctx, MiniJavaVarCtxManager varCtx, String id) {
         MiniJavaVar findRes = varCtx.findVar(id);
         if(findRes == null) {
-            CliUtil.err(ctx, String.format("Identifier '%s' not found.", id));
             hasSyntaxError = true;
-            return MiniJavaVar.makeError();
+            return CliUtil.err(ctx, String.format("Identifier '%s' not found.", id));
         }
         return findRes;
     }
@@ -197,8 +195,11 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitIf(MiniJavaParser.IfContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
-        if(v.isError()) return MiniJavaVar.makeError();
-        if(!matchType(ctx, v.type, "boolean")) return MiniJavaVar.makeError();
+        if(v.isError()) {
+            // return MiniJavaVar.makeError();
+        } else {
+            matchType(ctx, v.type, "boolean");
+        }
 
         MiniJavaVar ts = visit(ctx.t_stmt);
         MiniJavaVar fs = ctx.f_stmt == null ? MiniJavaVar.makeVoid() : visit(ctx.f_stmt);
@@ -207,7 +208,12 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitWhile(MiniJavaParser.WhileContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
-        if(v.isError()) return MiniJavaVar.makeError();
+        if(v.isError()) {
+            //return MiniJavaVar.makeError();
+        } else {
+            matchType(ctx, v.type, "boolean");
+        }
+
         return visit(ctx.stmt()).isError() ? MiniJavaVar.makeError() : MiniJavaVar.makeVoid();
     }
 
@@ -226,7 +232,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
         if(!matchType(ctx, v.type, retType)) return MiniJavaVar.makeError();
-        return MiniJavaVar.makeVoid();
+        return v;
     }
 
     @Override public MiniJavaVar visitAssign(MiniJavaParser.AssignContext ctx) {
@@ -274,8 +280,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             if(!doNotExec) System.out.println("println: int[] is not supported yet.");
             return MiniJavaVar.makeVoid();
         }
-        CliUtil.err(ctx, String.format("System.out.println: type '%s' is not supported.", a.type));
-        return MiniJavaVar.makeError();
+        return CliUtil.err(ctx, String.format("System.out.println: type '%s' is not supported.", a.type));
     }
 
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
@@ -291,8 +296,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(!isArrayType(ctx, findRes.type)) return MiniJavaVar.makeError();
 
         MiniJavaVar idx = visit(ctx.idx);
-        if(idx.isError()) return idx;
-        if(!matchType(ctx, idx.type, "int")) return MiniJavaVar.makeError();
+        if(!idx.isError())// return idx;
+            matchType(ctx, idx.type, "int");//) return MiniJavaVar.makeError();
 
         MiniJavaVar v = visit(ctx.v);
         if(v.isError()) return v;
@@ -365,9 +370,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(id.type.equals("0this")) {
             if(currentClass == null) {
                 // is null when in main class
-                CliUtil.err(ctx, "calling 'this' in mainClass is not supported yet.");
                 hasSyntaxError = true;
-                return MiniJavaVar.makeError();
+                return CliUtil.err(ctx, "calling 'this' in mainClass is not supported yet.");
             }
             klass = currentClass;
         } else {
@@ -390,8 +394,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(permission.equals("private")) {
             if(!id.type.equals("0this") && !currentClassName.equals(id.type)) {
                 hasSyntaxError = true;
-                CliUtil.err(ctx, String.format("Cannot access private method '%s.%s'.", id.type, methodName));
-                return MiniJavaVar.makeError();
+                return CliUtil.err(ctx, String.format("Cannot access private method '%s.%s'.", id.type, methodName));
             }
         }
 
@@ -399,9 +402,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         int n = args.size();
         if(sendingArgs.size()-1 != n) {
             hasSyntaxError = true;
-            CliUtil.err(ctx, String.format("Number of args(%d) for calling method '%s.%s' should be %d.",
+            return CliUtil.err(ctx, String.format("Number of args(%d) for calling method '%s.%s' should be %d.",
                     sendingArgs.size()-1, id.type, methodName, n));
-            return MiniJavaVar.makeError();
         }
 
         int i = 0;

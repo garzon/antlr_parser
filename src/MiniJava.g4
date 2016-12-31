@@ -12,9 +12,9 @@ permissionDesc : 'public' | 'private' ;
 argPair : type ID ;
 methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (argPair (',' argPair)* )? ')' stmtBlock ;
 
-type : arrType | basicType ;
+type : arrType | basicType;
 arrType : basicType '[' ']' ;
-basicType : 'boolean' | 'int' | ID ;
+basicType : 'boolean' | 'int' | ID;
 
 stmtBlock : '{' (stmt)* '}' ;
 

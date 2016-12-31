@@ -1,12 +1,19 @@
 import java.lang.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 
 import miniJava.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Created by ougar_000 on 2016/12/30.
  */
 
 public class Evaluator extends TypeChecker {
+
+    private MiniJavaVar returnVal = null;
+    private MiniJavaVar thisVal = null;
 
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         return super.visitClassDeclaration(ctx);
@@ -34,6 +41,10 @@ public class Evaluator extends TypeChecker {
         varCtx.enterBlock();
         for(MiniJavaParser.StmtContext stmt: ctx.stmt()) {
             if(visit(stmt).isError()) return MiniJavaVar.makeError();
+            if(returnVal != null) {
+                varCtx.exitBlock();
+                return MiniJavaVar.makeVoid();
+            }
         }
         varCtx.exitBlock();
         return MiniJavaVar.makeVoid();
@@ -50,14 +61,37 @@ public class Evaluator extends TypeChecker {
         return res;
     }
 
-    @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
+    @Override public MiniJavaVar visitIf(MiniJavaParser.IfContext ctx) {
         MiniJavaVar v = visit(ctx.exp());
-        return systemCall(ctx, v, false);
+        if(v.isError()) return MiniJavaVar.makeError();
+        else assert (matchType(ctx, v.type, "boolean"));
+
+        MiniJavaVar stmt = MiniJavaVar.makeVoid();
+        if((boolean)v.value) {
+            stmt = visit(ctx.t_stmt);
+        } else {
+            if(ctx.f_stmt != null)
+                stmt = visit(ctx.f_stmt);
+        }
+        return stmt;
     }
 
-    @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
-        String id = ctx.ID().getText();
-        return idFoundOrNot(ctx, varCtx, id);
+    @Override public MiniJavaVar visitWhile(MiniJavaParser.WhileContext ctx) {
+        MiniJavaVar v = visit(ctx.exp());
+        if(v.isError()) {
+            return MiniJavaVar.makeError();
+        }
+        assert (matchType(ctx, v.type, "boolean"));
+
+        while((boolean)v.value) {
+            if(visit(ctx.stmt()).isError()) return MiniJavaVar.makeError();
+        }
+        return  MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitReturn(MiniJavaParser.ReturnContext ctx) {
+        returnVal = super.visitReturn(ctx);
+        return MiniJavaVar.makeVoid();
     }
 
     @Override public MiniJavaVar visitAssign(MiniJavaParser.AssignContext ctx) {
@@ -65,22 +99,22 @@ public class Evaluator extends TypeChecker {
         String id = ctx.ID().getText();
 
         MiniJavaVar findRes = idFoundOrNot(ctx, varCtx, id);
-        if(findRes.isError()) return findRes;
+        //if(findRes.isError()) return findRes;
+        assert (!findRes.isError());
 
         if(!assignSym.equals("=")) {
             if(findRes.value == null) {
-                System.err.printf("[ERR] Variable '%s' used in '%s' before being initialized.\n", id, ctx.getText());
-                return MiniJavaVar.makeError();
+                return CliUtil.err(ctx, String.format("Variable '%s' used before being initialized.\n", id));
             }
         }
 
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
 
-        if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
+        assert (checkAssignOprType(ctx, v.type, findRes.type));
         if(assignSym.equals("=")) return varCtx.assignVar(id, v);
 
-        if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
+        assert (checkAssignOprType(ctx, findRes.type, "int"));// return MiniJavaVar.makeError();
         if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }
         if(assignSym.equals("/=")) { findRes.value = (int)findRes.value / (int)v.value; return findRes; }
         if(assignSym.equals("%=")) { findRes.value = (int)findRes.value % (int)v.value; return findRes; }
@@ -93,8 +127,141 @@ public class Evaluator extends TypeChecker {
         if(assignSym.equals(">>>=")) { findRes.value = (int)findRes.value >>> (int)v.value; return findRes; }
         if(assignSym.equals(">>=")) { findRes.value = (int)findRes.value >> (int)v.value; return findRes; }
 
-        System.err.printf("[ERR] Assignment of '%s' is not implemented yet.\n", assignSym);
+        assert (false);
+        //System.err.printf("[ERR] Assignment of '%s' is not implemented yet.\n", assignSym);
         return MiniJavaVar.makeError();
+    }
+
+    @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
+        MiniJavaVar v = visit(ctx.exp());
+        return systemCall(ctx, v, false);
+    }
+
+    private MiniJavaVar outOfRangeError(ParserRuleContext ctx) {
+        hasSyntaxError = true;
+        return CliUtil.err(ctx, "index out of range.");
+    }
+
+    @Override public MiniJavaVar visitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx) {
+        String id = ctx.ID().getText();
+
+        MiniJavaVar arr = idFoundOrNot(ctx, varCtx, id);
+        assert (!arr.isError());// return findRes;
+        assert (isArrayType(ctx, arr.type));// return MiniJavaVar.makeError();
+
+        MiniJavaVar idx = visit(ctx.idx);
+        if(idx.isError()) return idx;
+        assert (matchType(ctx, idx.type, "int"));// return MiniJavaVar.makeError();
+
+        MiniJavaVar v = visit(ctx.v);
+        if(v.isError()) return v;
+        assert (matchType(ctx, v.type, getElementType(arr.type)));//return MiniJavaVar.makeError();
+
+        Vector<MiniJavaVar> vec = (Vector<MiniJavaVar>) arr.value;
+        if((int)idx.value >= vec.size()) return outOfRangeError(ctx);
+
+        vec.set((int)idx.value, v);
+
+        return MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitBoolLiteral(MiniJavaParser.BoolLiteralContext ctx) {
+        return MiniJavaVar.makeBool(ctx.getText().equals("true"));
+    }
+
+    @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {
+        if(ctx.INT_BIN() != null) {
+            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText().substring(2), 2));
+        }
+        if(ctx.INT_DEC() != null) {
+            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText()));
+        }
+        if(ctx.INT_HEX() != null) {
+            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText().substring(2), 16));
+        }
+        return CliUtil.err(ctx, "Unknown type of int literal.");
+    }
+
+    @Override public MiniJavaVar visitThis(MiniJavaParser.ThisContext ctx) {
+        if(thisVal == null) {
+            return CliUtil.err(ctx, "[Runtime] Access 'this' in mainClass is not supported yet.");
+        }
+        return thisVal;
+    }
+
+    @Override public MiniJavaVar visitNewArr(MiniJavaParser.NewArrContext ctx) {
+        MiniJavaVar v = visit(ctx.exp());
+        if(v.isError()) return v;
+        assert (matchType(ctx, v.type, "int"));// return MiniJavaVar.makeError();
+
+        MiniJavaVar res = MiniJavaVar.makeInit(ctx.basicType().getText() + "[]");
+        Vector<MiniJavaVar> vec = new Vector<>();
+        for(int i=0; i<(int)v.value; i++) {
+            vec.add(MiniJavaVar.makeInit(ctx.basicType().getText()));
+        }
+        res.value = vec;
+
+        return res;
+    }
+
+    private MiniJavaVar addPropertyOfClass(ParserRuleContext ctx, MiniJavaClass klass, MiniJavaInstance inst) {
+        if(klass.parentClassName != null) {
+            MiniJavaClass parentClass = classFoundOrNot(ctx, klass.parentClassName);
+            if(parentClass == null) return MiniJavaVar.makeError();
+            addPropertyOfClass(ctx, parentClass, inst);
+        }
+        for(String propName: klass.property.keySet()) {
+            inst.varCtx.vars.put(propName, MiniJavaVar.makeInit(klass.property.get(propName)));
+        }
+        return MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitNewExp(MiniJavaParser.NewExpContext ctx) {
+        String className = ctx.ID().getText();
+        MiniJavaClass res = classFoundOrNot(ctx, className);
+        if(res == null) return MiniJavaVar.makeError();
+
+        MiniJavaVar v = MiniJavaVar.makeInit(className);
+
+        MiniJavaInstance inst = new MiniJavaInstance();
+        inst.klass = res;
+        if(addPropertyOfClass(ctx, res, inst) != null) return MiniJavaVar.makeError();
+
+        v.value = inst;
+        return v;
+    }
+
+    @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
+        return super.visitId(ctx);
+    }
+
+    @Override public MiniJavaVar visitIndexOf(MiniJavaParser.IndexOfContext ctx) {
+        MiniJavaVar arr = visit(ctx.id);
+        if(arr.isError()) return arr;
+        assert (isArrayType(ctx, arr.type));// return MiniJavaVar.makeError();
+
+        MiniJavaVar idx = visit(ctx.idx);
+        if(idx.isError()) return idx;
+        assert (matchType(ctx, idx.type, "int"));// return MiniJavaVar.makeError();
+
+        Vector<MiniJavaVar> vec = (Vector<MiniJavaVar>) arr.value;
+        if((int)idx.value >= vec.size()) return outOfRangeError(ctx);
+
+        return vec.get((int)idx.value);
+    }
+
+    @Override public MiniJavaVar visitGetLength(MiniJavaParser.GetLengthContext ctx) {
+        MiniJavaVar arr = visit(ctx.id);
+        if(arr.isError()) return arr;
+        assert (isArrayType(ctx, arr.type));// return MiniJavaVar.makeError();
+
+        Vector<MiniJavaVar> vec = (Vector<MiniJavaVar>) arr.value;
+
+        return MiniJavaVar.makeInt(vec.size());
+    }
+
+    @Override public MiniJavaVar visitGetMethod(MiniJavaParser.GetMethodContext ctx) {
+        // todo
     }
 
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
@@ -108,18 +275,11 @@ public class Evaluator extends TypeChecker {
         return binaryOp(ctx, first, second);
     }
 
-    @Override public MiniJavaVar visitIntLiteral(MiniJavaParser.IntLiteralContext ctx) {
-        if(ctx.INT_BIN() != null) {
-            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText().substring(2), 2));
-        }
-        if(ctx.INT_DEC() != null) {
-            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText()));
-        }
-        if(ctx.INT_HEX() != null) {
-            return MiniJavaVar.makeInt(Integer.parseInt(ctx.getText().substring(2), 16));
-        }
-        System.err.println("Unknown type of int literal.");
-        return MiniJavaVar.makeError();
+    @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {
+        MiniJavaVar first = visit(ctx.first);
+        MiniJavaVar second = visit(ctx.second);
+        MiniJavaVar third = visit(ctx.third);
+        return ternaryOp(ctx, first, second, third);
     }
 
 }
