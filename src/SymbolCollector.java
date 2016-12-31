@@ -103,15 +103,17 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         varCtx.enterBlock();
 
         Vector<String> methodArgs = new Vector<>();
+        Vector<String> methodArgsName = new Vector<>();
         for(MiniJavaParser.ArgPairContext arg: ctx.argPair()) {
             String varName, varType;
             varName = arg.ID().getText();
             varType = arg.type().getText();
-            //methodArgs.put(varName, varType);
+            methodArgsName.add(varName);
             methodArgs.add(varType);
             varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
         }
         currentClass.methodArgs.put(methodName, methodArgs);
+        currentClass.methodArgsName.put(methodName, methodArgsName);
 
         MiniJavaVar res = visitChildren(ctx);
 

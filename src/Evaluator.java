@@ -261,7 +261,90 @@ public class Evaluator extends TypeChecker {
     }
 
     @Override public MiniJavaVar visitGetMethod(MiniJavaParser.GetMethodContext ctx) {
-        // todo
+        MiniJavaVar id = visit(ctx.id);
+        if(id.isError()) return id;
+
+        String methodName = ctx.ID().getText();
+        MiniJavaClass klass;
+
+        if(id.type.equals("0this")) {
+            if(currentClass == null) {
+                // is null when in main class
+                hasSyntaxError = true;
+                return CliUtil.err(ctx, "calling 'this' in mainClass is not supported yet.");
+            }
+            klass = currentClass;
+        } else {
+            klass = classFoundOrNot(ctx, id.type);
+            if(klass == null) return MiniJavaVar.makeError();
+        }
+
+        // now klass must be not null
+        // TODO: find in parent class
+        MiniJavaParser.MethodDeclarationContext method = methodFoundOrNot(ctx, klass, methodName);
+        if(method == null)
+            return MiniJavaVar.makeError();
+
+        Vector<String> args = klass.methodArgs.get(methodName);
+        assert (args != null);
+        Vector<String> argsName = klass.methodArgsName.get(methodName);
+        assert (argsName != null);
+
+        String permission = klass.methodPermission.get(methodName);
+        assert (permission != null);
+
+        if(permission.equals("private")) {
+            if(!id.type.equals("0this") && !currentClassName.equals(id.type)) {
+                assert (false);
+                /*hasSyntaxError = true;
+                return CliUtil.err(ctx, String.format("Cannot access private method '%s.%s'.", id.type, methodName));*/
+            }
+        }
+
+        List<MiniJavaParser.ExpContext> sendingArgs = ctx.exp();
+        int n = argsName.size();
+        if(sendingArgs.size()-1 != n) {
+            assert (false);
+            /*hasSyntaxError = true;
+            return CliUtil.err(ctx, String.format("Number of args(%d) for calling method '%s.%s' should be %d.",
+                    sendingArgs.size()-1, id.type, methodName, n));*/
+        }
+
+        Vector<MiniJavaVar> calculatedArgs = new Vector<>();
+        int i = 0;
+        for(MiniJavaParser.ExpContext exp: sendingArgs) {
+            if(i == 0) {
+                i += 1;
+                continue;
+            }
+            MiniJavaVar arg = visit(exp);
+            if(arg.isError()) return arg;
+            assert (matchType(exp, arg.type, args.get(i-1)));
+            calculatedArgs.add(arg);
+            i += 1;
+        }
+
+        MiniJavaVarCtxManager savedCtx = varCtx;
+
+        varCtx = new MiniJavaVarCtxManager();
+        assert (id.value instanceof MiniJavaInstance);
+        varCtx.createInstanceCtx((MiniJavaInstance)id.value);
+        varCtx.enterBlock();
+        for(i = 0; i < n; i++) {
+            varCtx.assignVar(argsName.get(i), calculatedArgs.get(i));
+        }
+        MiniJavaVar ret = visit(method);
+        varCtx.exitBlock();
+
+        MiniJavaVar res = returnVal;
+        returnVal = null;
+        varCtx = savedCtx;
+
+        if(ret.isError()) return MiniJavaVar.makeError();
+
+        if(res == null) res = MiniJavaVar.makeVoid();
+        assert (res.type.equals(method.returnType.getText()));
+        return res;
     }
 
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {

@@ -413,6 +413,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
                 continue;
             }
             MiniJavaVar arg = visit(exp);
+            if(arg.isError()) return arg;
             if(!matchType(exp, arg.type, args.get(i-1)))
                 return MiniJavaVar.makeError();
             i += 1;

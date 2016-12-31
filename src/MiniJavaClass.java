@@ -12,6 +12,7 @@ public class MiniJavaClass {
     public HashMap<String, MiniJavaParser.MethodDeclarationContext> methods = new HashMap<>();
     public HashMap<String, String> methodPermission = new HashMap<>();
     public HashMap<String, Vector<String>> methodArgs = new HashMap<>();
+    public HashMap<String, Vector<String>> methodArgsName = new HashMap<>();
 
     public String parentClassName = null;
 
