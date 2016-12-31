@@ -13,6 +13,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     protected String currentClassName, currentMethodName, mainClassName;
     protected MiniJavaClass currentClass;
+    protected MiniJavaVar thisVal = null;
     protected MiniJavaVarCtxManager varCtx = new MiniJavaVarCtxManager();
 
     public static String getElementType(String arrType) {
@@ -114,6 +115,15 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return findRes;
     }
 
+    protected MiniJavaVar propertyFoundOrNot(ParserRuleContext ctx, MiniJavaInstance inst, String propName) {
+        MiniJavaVar findRes = inst.varCtx.vars.get(propName);
+        if(findRes == null) {
+            hasSyntaxError = true;
+            return CliUtil.err(ctx, String.format("Property '%s' of class '%s' not found.", propName, inst.klass.name));
+        }
+        return findRes;
+    }
+
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         currentClassName = ctx.className.getText();
         currentClass = classFoundOrNot(ctx, currentClassName);
@@ -129,7 +139,9 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         }
 
         varCtx.enterBlock();
+        thisVal = createInstance(ctx, currentClassName);
         visitChildren(ctx);
+        thisVal = null;
         varCtx.exitBlock();
         currentClass = null;
         currentClassName = null;
@@ -143,7 +155,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         currentClass = null;
 
         varCtx.enterBlock();
-        varCtx.assignVar(ctx.args.getText(), new MiniJavaVar("String[]", null));
+        varCtx.declareVar(ctx.args.getText(), new MiniJavaVar("String[]", null));
         currentMethodName = "main";
         visit(ctx.stmtBlock());
         currentMethodName = null;
@@ -160,7 +172,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             if(v.isError()) return MiniJavaVar.makeError();
             if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
         }
-        varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
+        varCtx.declareVar(varName, MiniJavaVar.makeInit(varType));
         return MiniJavaVar.makeVoid();
     }
 
@@ -182,7 +194,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             String varName, varType;
             varName = arg.ID().getText();
             varType = arg.type().getText();
-            varCtx.assignVar(varName, MiniJavaVar.makeInit(varType));
+            varCtx.declareVar(varName, MiniJavaVar.makeInit(varType));
         }
 
         currentMethodName = ctx.methodName.getText();
@@ -276,11 +288,14 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             if(!doNotExec) System.out.println((boolean)a.value);
             return MiniJavaVar.makeVoid();
         }
-        if(a.type.equals("int[]")) {
+        /*if(a.type.equals("int[]")) {
             if(!doNotExec) System.out.println("println: int[] is not supported yet.");
             return MiniJavaVar.makeVoid();
-        }
-        return CliUtil.err(ctx, String.format("System.out.println: type '%s' is not supported.", a.type));
+        }*/
+        if(!doNotExec) System.out.println((Vector<MiniJavaVar>)a.value);
+        return MiniJavaVar.makeVoid();
+
+        //return CliUtil.err(ctx, String.format("System.out.println: type '%s' is not supported.", a.type));
     }
 
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
@@ -316,7 +331,10 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitThis(MiniJavaParser.ThisContext ctx) {
-        return MiniJavaVar.makeInit("0this");
+        if(thisVal == null) {
+            return CliUtil.err(ctx, "[Runtime] Access 'this' in mainClass is not supported yet.");
+        }
+        return thisVal;
     }
 
     @Override public MiniJavaVar visitNewArr(MiniJavaParser.NewArrContext ctx) {
@@ -327,11 +345,35 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return MiniJavaVar.makeInit(ctx.basicType().getText() + "[]");
     }
 
-    @Override public MiniJavaVar visitNewExp(MiniJavaParser.NewExpContext ctx) {
-        String className = ctx.ID().getText();
+    protected MiniJavaVar addPropertyOfClass(ParserRuleContext ctx, MiniJavaClass klass, MiniJavaInstance inst) {
+        if(klass.parentClassName != null) {
+            MiniJavaClass parentClass = classFoundOrNot(ctx, klass.parentClassName);
+            if(parentClass == null) return MiniJavaVar.makeError();
+            addPropertyOfClass(ctx, parentClass, inst);
+        }
+        for(String propName: klass.property.keySet()) {
+            inst.varCtx.vars.put(propName, MiniJavaVar.makeInit(klass.property.get(propName)));
+        }
+        return MiniJavaVar.makeVoid();
+    }
+
+    protected MiniJavaVar createInstance(ParserRuleContext ctx, String className) {
         MiniJavaClass res = classFoundOrNot(ctx, className);
         if(res == null) return MiniJavaVar.makeError();
-        return MiniJavaVar.makeInit(className);
+
+        MiniJavaVar v = MiniJavaVar.makeInit(className);
+
+        MiniJavaInstance inst = new MiniJavaInstance();
+        inst.klass = res;
+        if(addPropertyOfClass(ctx, res, inst).isError()) return MiniJavaVar.makeError();
+
+        v.value = inst;
+        return v;
+    }
+
+    @Override public MiniJavaVar visitNewExp(MiniJavaParser.NewExpContext ctx) {
+        String className = ctx.ID().getText();
+        return createInstance(ctx, className);
     }
 
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
@@ -358,6 +400,30 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             return MiniJavaVar.makeError();
 
         return MiniJavaVar.makeInit("int");
+    }
+
+    protected MiniJavaVar getProperty(MiniJavaParser.GetPropertyContext ctx) {
+        MiniJavaVar id = visit(ctx.id);
+        if(id.isError()) return id;
+
+        if(!(id.value instanceof MiniJavaInstance)) {
+            if(id.type.equals("0this")) {
+                id = thisVal;
+                if(id == null) {
+                    // 'this' in main class
+                    return CliUtil.err(ctx, "'this' pointer in mainClass is not supported yet.");
+                }
+            } else {
+                matchType(ctx, id.type, "an instance");
+                return MiniJavaVar.makeError();
+            }
+        }
+
+        return propertyFoundOrNot(ctx, (MiniJavaInstance)id.value, ctx.ID().getText());
+    }
+
+    @Override public MiniJavaVar visitGetProperty(MiniJavaParser.GetPropertyContext ctx) {
+        return mockVar(getProperty(ctx));
     }
 
     @Override public MiniJavaVar visitGetMethod(MiniJavaParser.GetMethodContext ctx) {

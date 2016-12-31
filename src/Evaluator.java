@@ -13,7 +13,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class Evaluator extends TypeChecker {
 
     private MiniJavaVar returnVal = null;
-    private MiniJavaVar thisVal = null;
 
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         assert (false);
@@ -34,13 +33,14 @@ public class Evaluator extends TypeChecker {
             //if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
             assert (matchType(ctx, v.type, varType));
         }
-        varCtx.assignVar(varName, v);
+        varCtx.declareVar(varName, v);
         return MiniJavaVar.makeVoid();
     }
 
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
         varCtx.enterBlock();
         for(MiniJavaParser.StmtContext stmt: ctx.stmt()) {
+            //System.out.println(stmt.getText());
             if(visit(stmt).isError()) return MiniJavaVar.makeError();
             if(returnVal != null) {
                 varCtx.exitBlock();
@@ -49,6 +49,10 @@ public class Evaluator extends TypeChecker {
         }
         varCtx.exitBlock();
         return MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitStmtExp(MiniJavaParser.StmtExpContext ctx) {
+        return visit(ctx.exp());
     }
 
     @Override public MiniJavaVar visitBlock(MiniJavaParser.BlockContext ctx) {
@@ -183,10 +187,7 @@ public class Evaluator extends TypeChecker {
     }
 
     @Override public MiniJavaVar visitThis(MiniJavaParser.ThisContext ctx) {
-        if(thisVal == null) {
-            return CliUtil.err(ctx, "[Runtime] Access 'this' in mainClass is not supported yet.");
-        }
-        return thisVal;
+        return super.visitThis(ctx);
     }
 
     @Override public MiniJavaVar visitNewArr(MiniJavaParser.NewArrContext ctx) {
@@ -204,31 +205,8 @@ public class Evaluator extends TypeChecker {
         return res;
     }
 
-    private MiniJavaVar addPropertyOfClass(ParserRuleContext ctx, MiniJavaClass klass, MiniJavaInstance inst) {
-        if(klass.parentClassName != null) {
-            MiniJavaClass parentClass = classFoundOrNot(ctx, klass.parentClassName);
-            if(parentClass == null) return MiniJavaVar.makeError();
-            addPropertyOfClass(ctx, parentClass, inst);
-        }
-        for(String propName: klass.property.keySet()) {
-            inst.varCtx.vars.put(propName, MiniJavaVar.makeInit(klass.property.get(propName)));
-        }
-        return MiniJavaVar.makeVoid();
-    }
-
     @Override public MiniJavaVar visitNewExp(MiniJavaParser.NewExpContext ctx) {
-        String className = ctx.ID().getText();
-        MiniJavaClass res = classFoundOrNot(ctx, className);
-        if(res == null) return MiniJavaVar.makeError();
-
-        MiniJavaVar v = MiniJavaVar.makeInit(className);
-
-        MiniJavaInstance inst = new MiniJavaInstance();
-        inst.klass = res;
-        if(addPropertyOfClass(ctx, res, inst).isError()) return MiniJavaVar.makeError();
-
-        v.value = inst;
-        return v;
+        return super.visitNewExp(ctx);
     }
 
     @Override public MiniJavaVar visitId(MiniJavaParser.IdContext ctx) {
@@ -258,6 +236,10 @@ public class Evaluator extends TypeChecker {
         Vector<MiniJavaVar> vec = (Vector<MiniJavaVar>) arr.value;
 
         return MiniJavaVar.makeInt(vec.size());
+    }
+
+    @Override public MiniJavaVar visitGetProperty(MiniJavaParser.GetPropertyContext ctx) {
+        return getProperty(ctx);
     }
 
     @Override public MiniJavaVar visitGetMethod(MiniJavaParser.GetMethodContext ctx) {
@@ -339,7 +321,7 @@ public class Evaluator extends TypeChecker {
         varCtx.createInstanceCtx((MiniJavaInstance)id.value);
         varCtx.enterBlock();
         for(i = 0; i < n; i++) {
-            varCtx.assignVar(argsName.get(i), calculatedArgs.get(i));
+            varCtx.declareVar(argsName.get(i), calculatedArgs.get(i));
         }
         //System.out.printf("calling %s with ", methodName);System.out.println(calculatedArgs);
 

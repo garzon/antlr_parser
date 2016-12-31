@@ -244,17 +244,17 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitSetIndexOf(MiniJavaParser.SetIndexOfContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code dummy}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * Enter a parse tree produced by the {@code stmtExp}
+	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void enterDummy(MiniJavaParser.DummyContext ctx);
+	void enterStmtExp(MiniJavaParser.StmtExpContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code dummy}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * Exit a parse tree produced by the {@code stmtExp}
+	 * labeled alternative in {@link MiniJavaParser#stmt}.
 	 * @param ctx the parse tree
 	 */
-	void exitDummy(MiniJavaParser.DummyContext ctx);
+	void exitStmtExp(MiniJavaParser.StmtExpContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code binaryOp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
@@ -267,6 +267,18 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBinaryOp(MiniJavaParser.BinaryOpContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code getProperty}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterGetProperty(MiniJavaParser.GetPropertyContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code getProperty}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitGetProperty(MiniJavaParser.GetPropertyContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code newExp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
@@ -292,18 +304,6 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitThis(MiniJavaParser.ThisContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code getLength}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void enterGetLength(MiniJavaParser.GetLengthContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code getLength}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void exitGetLength(MiniJavaParser.GetLengthContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code unaryOp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
 	 * @param ctx the parse tree
@@ -315,6 +315,54 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitUnaryOp(MiniJavaParser.UnaryOpContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code getMethod}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterGetMethod(MiniJavaParser.GetMethodContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code getMethod}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitGetMethod(MiniJavaParser.GetMethodContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code literal}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteral(MiniJavaParser.LiteralContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code literal}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteral(MiniJavaParser.LiteralContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code dummy}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterDummy(MiniJavaParser.DummyContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code dummy}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitDummy(MiniJavaParser.DummyContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code getLength}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterGetLength(MiniJavaParser.GetLengthContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code getLength}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitGetLength(MiniJavaParser.GetLengthContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code newArr}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
@@ -340,18 +388,6 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitId(MiniJavaParser.IdContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code getMethod}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void enterGetMethod(MiniJavaParser.GetMethodContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code getMethod}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void exitGetMethod(MiniJavaParser.GetMethodContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code ternaryOp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
 	 * @param ctx the parse tree
@@ -375,18 +411,6 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIndexOf(MiniJavaParser.IndexOfContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code literal}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void enterLiteral(MiniJavaParser.LiteralContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code literal}
-	 * labeled alternative in {@link MiniJavaParser#exp}.
-	 * @param ctx the parse tree
-	 */
-	void exitLiteral(MiniJavaParser.LiteralContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MiniJavaParser#boolLiteral}.
 	 * @param ctx the parse tree

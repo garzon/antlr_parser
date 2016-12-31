@@ -14,7 +14,7 @@ methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (argPair (
 
 type : arrType | basicType;
 arrType : basicType '[' ']' ;
-basicType : 'boolean' | 'int' | ID;
+basicType : 'boolean' | 'int' | 'void' | ID;
 
 stmtBlock : '{' (stmt)* '}' ;
 
@@ -30,15 +30,17 @@ stmt : varDeclaration #var
     | 'return' exp ';' #return
     | ID assignSym v=exp ';' #assign
     | ID '[' idx=exp ']' assignSym v=exp ';' #setIndexOf
+    | exp ';' #stmtExp
 ;
 
 exp : intLiteral #literal
     | boolLiteral #literal
     | '(' exp ')' #dummy
 
-    | id=exp '[' idx=exp ']' #indexOf
     | id=exp '.' ID '(' (exp (',' exp)* )? ')' #getMethod
     | id=exp '.' 'length' #getLength
+    | id=exp '.' ID #getProperty
+    | id=exp '[' idx=exp ']' #indexOf
 
     | op=('!' | '+' | '-' | '~') first=exp #unaryOp
     | first=exp op=('*' | '/' | '%') second=exp #binaryOp

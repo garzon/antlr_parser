@@ -25,9 +25,22 @@ public class MiniJavaVarCtxManager {
 
     public boolean isTopLevel() { return contexts.size() == 1; }
 
-    public MiniJavaVar assignVar(String varName, MiniJavaVar varValue) {
+    public MiniJavaVar declareVar(String varName, MiniJavaVar varValue) {
         contexts.peek().vars.put(varName, varValue);
         return varValue;
+    }
+
+    public MiniJavaVar assignVar(String varName, MiniJavaVar varValue) {
+        int n = contexts.size();
+        for(n -= 1; n >= 0; n--) {
+            MiniJavaVar findRes = contexts.get(n).vars.get(varName);
+            if(findRes != null) {
+                contexts.get(n).vars.put(varName, varValue);
+                return varValue;
+            }
+        }
+        assert (false);
+        return null;
     }
 
     public MiniJavaVar findVar(String varName) {
