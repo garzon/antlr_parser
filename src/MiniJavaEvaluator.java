@@ -74,44 +74,10 @@ public class MiniJavaEvaluator extends MiniJavaBaseVisitor<MiniJavaVar> {
         return MiniJavaVar.makeRuntimeError();
     }
 
-
-
-    private boolean checkUnaryOprType(MiniJavaParser.UnaryOpContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
-            System.err.printf("[ERR] unaryOp '%s' of '%s': unexpected type '%s', '%s' expected", ctx.op.getText(), ctx.getText(), type1, type2);
-            return false;
-        }
-        return true;
-    }
-
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
         MiniJavaVar res = visit(ctx.first);
-        if(res.isError()) return res;
-        String type = res.type;
-        switch (ctx.op.getText().charAt(0)) {
-            case '!':
-                if(!checkUnaryOprType(ctx, type, "boolean")) return MiniJavaVar.makeRuntimeError();
-                res.value = !(boolean)res.value;
-                break;
-            case '+':
-                if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
-                break;
-            case '-':
-                if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
-                res.value = -(int)res.value;
-                break;
-            case '~':
-                if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
-                res.value = ~(int)res.value;
-                break;
-            default:
-                System.err.printf("unaryOp: '%s' is not supported yet.\n", ctx.op.getText());
-                return MiniJavaVar.makeRuntimeError();
-        }
-        return res;
+        return Eval.unaryOp(ctx, res);
     }
-
-
 
     @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
         MiniJavaVar first = visit(ctx.first);

@@ -86,7 +86,8 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar criteria = Eval.visitIf(ctx, v);
         if(criteria.isError()) return MiniJavaVar.makeRuntimeError();
 
-        MiniJavaVar ts = visit(ctx.t_stmt), fs = visit(ctx.f_stmt);
+        MiniJavaVar ts = visit(ctx.t_stmt);
+        MiniJavaVar fs = ctx.f_stmt == null ? MiniJavaVar.makeVoid() : visit(ctx.f_stmt);
         return (ts.isError() || fs.isError()) ? MiniJavaVar.makeRuntimeError() : MiniJavaVar.makeVoid();
     }
 
@@ -141,8 +142,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             return MiniJavaVar.makeVoid();
         }
 
-        CliUtil.err(ctx, String.format("Assignment of '%s' is not implemented yet.", assignSym));
-        return MiniJavaVar.makeRuntimeError();
+        return SyntaxChecker.opNotImplemented(ctx, assignSym);
     }
 
     @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
@@ -169,9 +169,21 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return MiniJavaVar.makeVoid();
     }
 
+    @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
+        MiniJavaVar first = visit(ctx.first);
+        return SyntaxChecker.unaryOp(ctx, first);
+    }
+
     @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
         MiniJavaVar first = visit(ctx.first);
         MiniJavaVar second = visit(ctx.second);
         return SyntaxChecker.binaryOp(ctx, first, second);
+    }
+
+    @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {
+        MiniJavaVar first = visit(ctx.first);
+        MiniJavaVar second = visit(ctx.second);
+        MiniJavaVar third = visit(ctx.third);
+        return SyntaxChecker.ternaryOp(ctx, first, second, third);
     }
 }

@@ -47,7 +47,7 @@ exp : intLiteral #literal
     | first=exp op='|' second=exp #binaryOp
     | first=exp op='&&' second=exp #binaryOp
     | first=exp op='||' second=exp #binaryOp
-    | first=exp '?' second=exp ':' third=exp #ternaryOp
+    | first=exp op='?' second=exp ':' third=exp #ternaryOp
     | boolLiteral #literal
     | 'this' #this
     | 'new' 'int' '[' exp ']' #newIntArr

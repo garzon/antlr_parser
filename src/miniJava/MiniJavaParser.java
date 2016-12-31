@@ -1403,6 +1403,7 @@ public class MiniJavaParser extends Parser {
 	}
 	public static class TernaryOpContext extends ExpContext {
 		public ExpContext first;
+		public Token op;
 		public ExpContext second;
 		public ExpContext third;
 		public List<ExpContext> exp() {
@@ -1790,7 +1791,7 @@ public class MiniJavaParser extends Parser {
 						setState(220);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(221);
-						match(T__59);
+						((TernaryOpContext)_localctx).op = match(T__59);
 						setState(222);
 						((TernaryOpContext)_localctx).second = exp(0);
 						setState(223);

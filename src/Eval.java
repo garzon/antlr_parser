@@ -59,6 +59,31 @@ public class Eval {
         return visitSystemCall(ctx, a, false);
     }
 
+    public static MiniJavaVar unaryOp(MiniJavaParser.UnaryOpContext ctx, MiniJavaVar res) {
+        if(res.isError()) return res;
+        String type = res.type;
+        switch (ctx.op.getText().charAt(0)) {
+            case '!':
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "boolean")) return MiniJavaVar.makeRuntimeError();
+                res.value = !(boolean)res.value;
+                break;
+            case '+':
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
+                break;
+            case '-':
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
+                res.value = -(int)res.value;
+                break;
+            case '~':
+                if(!SyntaxChecker.checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeRuntimeError();
+                res.value = ~(int)res.value;
+                break;
+            default:
+                return SyntaxChecker.opNotImplemented(ctx, ctx.op.getText());
+        }
+        return res;
+    }
+
     public static MiniJavaVar binaryOp(MiniJavaParser.BinaryOpContext ctx, MiniJavaVar first, MiniJavaVar second) {
         if(first.isError()) return first;
         if(second.isError()) return second;
@@ -134,5 +159,19 @@ public class Eval {
         return SyntaxChecker.opNotImplemented(ctx, opSym);
     }
 
+    public static MiniJavaVar ternaryOp(MiniJavaParser.TernaryOpContext ctx, MiniJavaVar first, MiniJavaVar second, MiniJavaVar third) {
+        if(first.isError()) return first;
+        if(second.isError()) return second;
+        if(third.isError()) return third;
 
+        String opSym = ctx.op.getText();
+        if(opSym.equals("?")) {
+            if(!SyntaxChecker.matchType(ctx, first.type, "boolean")) return MiniJavaVar.makeRuntimeError();
+            if(!SyntaxChecker.matchType(ctx, second.type, third.type)) return MiniJavaVar.makeRuntimeError();
+            if((boolean)first.value) return second;
+            else return third;
+        }
+
+        return SyntaxChecker.opNotImplemented(ctx, opSym);
+    }
 }

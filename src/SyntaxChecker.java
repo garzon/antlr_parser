@@ -27,7 +27,15 @@ public class SyntaxChecker {
 
     public static boolean checkOprType(MiniJavaParser.BinaryOpContext ctx, String type1, String type2) {
         if(!type1.equals(type2)) {
-            CliUtil.err(ctx, String.format("Op '%s': operand type '%s' not match '%s'", ctx.op.getText(), type1, type2));
+            CliUtil.err(ctx, String.format("binaryOp '%s': operand type '%s' not match '%s'", ctx.op.getText(), type1, type2));
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkUnaryOprType(MiniJavaParser.UnaryOpContext ctx, String type1, String type2) {
+        if(!type1.equals(type2)) {
+            CliUtil.err(ctx, String.format("unaryOp '%s': unexpected type '%s', '%s' expected", ctx.op.getText(), ctx.getText(), type1, type2));
             return false;
         }
         return true;
@@ -63,9 +71,21 @@ public class SyntaxChecker {
         return res;
     }
 
+    public static MiniJavaVar unaryOp(MiniJavaParser.UnaryOpContext ctx, MiniJavaVar first) {
+        first = mockVar(first);
+        return Eval.unaryOp(ctx, first);
+    }
+
     public static MiniJavaVar binaryOp(MiniJavaParser.BinaryOpContext ctx, MiniJavaVar first, MiniJavaVar second) {
         first = mockVar(first);
         second = mockVar(second);
         return Eval.binaryOp(ctx, first, second);
+    }
+
+    public static MiniJavaVar ternaryOp(MiniJavaParser.TernaryOpContext ctx, MiniJavaVar first, MiniJavaVar second, MiniJavaVar third) {
+        first = mockVar(first);
+        second = mockVar(second);
+        third = mockVar(third);
+        return Eval.ternaryOp(ctx, first, second, third);
     }
 }
