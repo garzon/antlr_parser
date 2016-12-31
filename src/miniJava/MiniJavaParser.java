@@ -1204,8 +1204,8 @@ public class MiniJavaParser extends Parser {
 		}
 	}
 	public static class ForContext extends StmtContext {
-		public StmtContext st_stmt;
-		public StmtBodyContext end_stmt;
+		public StmtContext start_stmt;
+		public StmtBodyContext step_stmt;
 		public StmtContext body;
 		public ExpContext exp() {
 			return getRuleContext(ExpContext.class,0);
@@ -1414,13 +1414,13 @@ public class MiniJavaParser extends Parser {
 				setState(171);
 				match(T__6);
 				setState(172);
-				((ForContext)_localctx).st_stmt = stmt();
+				((ForContext)_localctx).start_stmt = stmt();
 				setState(173);
 				exp(0);
 				setState(174);
 				match(T__14);
 				setState(175);
-				((ForContext)_localctx).end_stmt = stmtBody();
+				((ForContext)_localctx).step_stmt = stmtBody();
 				setState(176);
 				match(T__10);
 				setState(177);

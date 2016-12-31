@@ -1,71 +1,34 @@
-class ExampleMiniJava {
+
+class MiniJava {
     public static void main(String[] args) {
-        int res;
-        res = 0b10;
-        System.out.println(res);
-        res *= 8;
-        System.out.println(res);
-        res -= 3;
-        System.out.println(res);
-        int a;
-        a = 3;
-        res = res + a;
-        //System.out.println(res);
-        {
-            int b;
-            b = -+-++-2;
-            if(b == 1) {
-                b = 0x1a >> 2 & 3 + 3;
-            }
-        }
-        System.out.println(1+3*2 < 5);
-        System.out.println(1 + 1 == 2);
-        System.out.println(false || false);
-        System.out.println(1+3*2 < 5 || 1 + 1 != 2);
-        SubClass fib_seq;
-        fib_seq = new SubClass();
-        int i;
-        i = 1;
-        while(i < 8) {
-            System.out.println(fib_seq.fib(i));
-            i += 1;
-        }
+        Seq seq = new Seq().Seq(15);
+        for(int i=0; i<=15; i+=1)
+            System.out.println(seq.get_fib(15));
     }
 }
 
-class SubClass
-//extends ExampleMiniJava
-{
-    int[] arr;
-    boolean flag;
+class Seq {
+    int[] fib_saver;
     
-    public int fib(int i) {
-        int bad;
-        //bad = 0h00001;
-        if(i < 2) return 1;
-        else return this.fib(i-1)+this.fib(i-2);
+    // something like constructor
+    public Seq Seq(int n) {
+        fib_saver = new int[n+1];
+        fib_saver[1] = 1;
+        fib_saver[0] = 1;
+        int j = 2;
+        while(j <= n) {
+            this.calc_fib(j);
+            j += 1;
+        }
+        System.out.println(fib_saver);
+        return this;
     }
     
-    //private ExampleMiniJava makeInst() {
-    //    return new ExampleMiniJava();
-    //}
-}
-
-class SubClass2
-//extends ClassFullOfErrors
-{
-    public int error1(int i) {
-        i = 1;
-        //j = 1;
-        boolean errorAgain;
-        errorAgain = true;
-        //boolean errorAgain;
-        {
-            int testBlock;
-            {
-                int testBlock;
-            //    boolean testBlock;
-            }
-        }
+    public int get_fib(int i) {
+        return this.fib_saver[i];
+    }
+    
+    private void calc_fib(int i) {
+        fib_saver[i] = fib_saver[i-1] + fib_saver[i-2];
     }
 }

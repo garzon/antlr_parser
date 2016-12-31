@@ -32,7 +32,7 @@ stmt : varDeclaration #var
     | stmtBlock #block
     | 'if' '(' exp ')' t_stmt=stmt ('else' f_stmt=stmt)? #if
     | 'while' '(' exp ')' stmt #while
-    | 'for' '(' st_stmt=stmt exp ';' end_stmt=stmtBody ')' body=stmt #for
+    | 'for' '(' start_stmt=stmt exp ';' step_stmt=stmtBody ')' body=stmt #for
     | systemCallName='System.out.println' '(' exp ')' ';' #systemCall
     | stmtBody ';' #normalStmt
     | ';' #emptyStmt

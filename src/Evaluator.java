@@ -95,6 +95,28 @@ public class Evaluator extends TypeChecker {
         return  MiniJavaVar.makeVoid();
     }
 
+    @Override public MiniJavaVar visitFor(MiniJavaParser.ForContext ctx) {
+        MiniJavaVar st = visit(ctx.start_stmt);
+        if(st.isError()) return st;
+        MiniJavaVar criteria = visit(ctx.exp());
+        if(criteria.isError()) return criteria;
+        assert (matchType(ctx, criteria.type, "boolean"));
+
+        while((boolean)criteria.value) {
+            MiniJavaVar body = visit(ctx.stmtBody());
+            if(body.isError()) return body;
+
+            MiniJavaVar stm = visit(ctx.step_stmt);
+            if(stm.isError()) return stm;
+
+            criteria = visit(ctx.exp());
+            if(criteria.isError()) return criteria;
+            assert (matchType(ctx, criteria.type, "boolean"));
+        }
+
+        return MiniJavaVar.makeVoid();
+    }
+
     @Override public MiniJavaVar visitReturn(MiniJavaParser.ReturnContext ctx) {
         returnVal = super.visitReturn(ctx);
         return MiniJavaVar.makeVoid();
@@ -347,7 +369,11 @@ public class Evaluator extends TypeChecker {
         if(ret.isError()) return MiniJavaVar.makeError();
 
         if(res == null) res = MiniJavaVar.makeVoid();
-        assert (res.type.equals(method.returnType.getText()));
+
+        if(!matchType(ctx, res.type, method.returnType.getText())) {
+            System.err.printf("\t%s.%s(): Forgot to return a value?\n", klass.name, methodName);
+            return MiniJavaVar.makeError();
+        }
         return res;
     }
 

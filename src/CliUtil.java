@@ -31,7 +31,7 @@ public class CliUtil {
         for(Token token: getFirst10Tokens(ctx)) {
             sourceContext += token.getText() + " ";
         }
-        sourceContext += "...";
+        // sourceContext += "...";
         System.err.printf("[ERR] Line %d, Char %d, '%s':\n\t%s\n", firstToken.getLine(), firstToken.getCharPositionInLine(),
                 sourceContext, msg);
         return MiniJavaVar.makeError();
