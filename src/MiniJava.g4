@@ -68,4 +68,4 @@ INT_BIN : '0b'[01]+;
 INT_DEC : [0-9]+ ;
 
 WS : [ \t\r\n]+ -> skip ;
-COMMENT : '//'[^\n]*[\n] -> skip;
+COMMENT : '//'~[\r\n]* -> skip;

@@ -27,6 +27,17 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
         currentClassName = ctx.className.getText();
         currentClass = findDefinedClass(ctx, currentClassName);
+        assert (currentClass != null); // all classes should have been collected in collector
+
+        if(currentClass.parentClassName != null) {
+            if(findDefinedClass(ctx, currentClass.parentClassName) == null) {
+                hasSyntaxError = true;
+                //CliUtil.err(ctx, String.format("parent class '%s' undefined.", currentClass.parentClassName));
+                currentClass = null;
+                currentClassName = null;
+                return MiniJavaVar.makeError();
+            }
+        }
 
         varCtx.enterBlock();
         visitChildren(ctx);
@@ -123,7 +134,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         String id = ctx.ID().getText();
 
         MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes == null) {
+        if(findRes.isError()) {
             hasSyntaxError = true;
             return MiniJavaVar.makeError();
         }
@@ -161,7 +172,7 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         String id = ctx.ID().getText();
 
         MiniJavaVar findRes = Eval.idFoundOrNot(ctx, varCtx, id);
-        if(findRes == null) {
+        if(findRes.isError()) {
             hasSyntaxError = true;
             return MiniJavaVar.makeError();
         }
@@ -294,17 +305,21 @@ public class MiniJavaTypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         List<MiniJavaParser.ExpContext> sendingArgs = ctx.exp();
         int n = args.size();
-        if(sendingArgs.size() != n) {
+        if(sendingArgs.size()-1 != n) {
             hasSyntaxError = true;
             CliUtil.err(ctx, String.format("Number of args(%d) for calling method '%s.%s' should be %d.",
-                    sendingArgs.size(), id.type, methodName, n));
+                    sendingArgs.size()-1, id.type, methodName, n));
             return MiniJavaVar.makeError();
         }
 
         int i = 0;
         for(MiniJavaParser.ExpContext exp: sendingArgs) {
+            if(i == 0) {
+                i += 1;
+                continue;
+            }
             MiniJavaVar arg = visit(exp);
-            if(!SyntaxChecker.matchType(exp, arg.type, args.get(i))) {
+            if(!SyntaxChecker.matchType(exp, arg.type, args.get(i-1))) {
                 hasSyntaxError = true;
                 return MiniJavaVar.makeError();
             }

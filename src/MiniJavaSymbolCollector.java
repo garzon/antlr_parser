@@ -29,7 +29,8 @@ public class MiniJavaSymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         if(checkRedefinedClass(ctx)) return MiniJavaVar.makeError();
 
-        currentClass.parentClassName = ctx.parentName.getText();
+        if(ctx.parentName != null)
+            currentClass.parentClassName = ctx.parentName.getText();
         currentClass.ctx = ctx;
 
         classes.put(currentClassName, currentClass);
