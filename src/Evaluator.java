@@ -268,13 +268,13 @@ public class Evaluator extends TypeChecker {
         }
 
         // now klass must be not null
-        // TODO: find in parent class
         MiniJavaParser.MethodDeclarationContext method = methodFoundOrNot(ctx, klass, methodName);
         if(method == null)
             return MiniJavaVar.makeError();
 
         Vector<String> args = klass.methodArgs.get(methodName);
         assert (args != null);
+
         Vector<String> argsName = klass.methodArgsName.get(methodName);
         assert (argsName != null);
 

@@ -98,6 +98,12 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             if(methodName.equals("main")) return null;
         } else {
             findRes = klass.methods.get(methodName);
+            MiniJavaClass searchClass = klass;
+            while(findRes == null && searchClass.parentClassName != null) {
+                searchClass = classFoundOrNot(ctx, searchClass.parentClassName);
+                if(searchClass == null) return null;
+                findRes = searchClass.methods.get(methodName);
+            }
         }
         if(findRes == null) {
             CliUtil.err(ctx, String.format("Method '%s' not found.", methodName));
@@ -450,7 +456,6 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         }
 
         // now klass must be not null
-        // TODO: find in parent class
         MiniJavaParser.MethodDeclarationContext method = methodFoundOrNot(ctx, klass, methodName);
         if(method == null)
             return MiniJavaVar.makeError();
