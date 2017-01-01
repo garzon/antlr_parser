@@ -222,10 +222,10 @@ public class Evaluator extends TypeChecker {
         if(v.isError()) return v;
         assert (matchType(ctx, v.type, "int"));// return MiniJavaVar.makeError();
 
-        MiniJavaVar res = MiniJavaVar.makeInit(ctx.basicType().getText() + "[]");
+        MiniJavaVar res = makeInit(ctx, ctx.basicType().getText() + "[]");
         Vector<MiniJavaVar> vec = new Vector<>();
         for(int i=0; i<(int)v.value; i++) {
-            MiniJavaVar ele = MiniJavaVar.makeInitVar(ctx.basicType().getText());
+            MiniJavaVar ele = MiniJavaVar.makeInitVar(ctx, classes, ctx.basicType().getText());
             /*if(ele.isError()) {
                 hasSyntaxError = true;
                 return CliUtil.err(ctx, "Array of array is not supported yet.");
@@ -290,6 +290,7 @@ public class Evaluator extends TypeChecker {
                 return CliUtil.err(ctx, "calling 'this' in mainClass is not supported yet.");
             }
             klass = currentClass;
+
         } else {
             //klass = classFoundOrNot(ctx, id.type);
             //if(klass == null) return MiniJavaVar.makeError();
@@ -354,8 +355,7 @@ public class Evaluator extends TypeChecker {
         currentClassName = klass.name;
         thisVal = id;
         varCtx = new MiniJavaVarCtxManager();
-        assert (id.value instanceof MiniJavaInstance);
-        varCtx.createInstanceCtx((MiniJavaInstance)id.value);
+
         varCtx.enterBlock();
         for(i = 0; i < n; i++) {
             varCtx.declareVar(argsName.get(i), MiniJavaVar.makeNewObj(args.get(i), calculatedArgs.get(i)));

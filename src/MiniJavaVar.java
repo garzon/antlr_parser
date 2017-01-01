@@ -3,6 +3,7 @@
  */
 
 import com.sun.istack.internal.Nullable;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.lang.*;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ public class MiniJavaVar {
     public final String type;
     public Object value;
 
-    public MiniJavaVar(String _type, @Nullable Object _value) {
+    private MiniJavaVar(String _type, @Nullable Object _value) {
         type = _type;
         value = _value;
     }
@@ -50,30 +51,44 @@ public class MiniJavaVar {
 
     public static MiniJavaVar makeError() { return new MiniJavaVar("0Error", 0); }
 
-    public static MiniJavaVar makeInitVar(String type) {
+    public static MiniJavaVar makeInitVar(ParserRuleContext ctx, HashMap<String, MiniJavaClass> classes, String type) {
         if(isArrayType(type)) {
-            MiniJavaVar arr = makeInit(type);
+            MiniJavaVar arr = new MiniJavaVar(type, null);
             arr.value = new Vector<MiniJavaVar>();
             return arr;
         } else {
             if(type.equals("int")) return makeInt(0);
             if(type.equals("boolean")) return makeBool(false);
-            MiniJavaVar inst = makeInit(type);
-            inst.value = new MiniJavaInstance();
-            return inst;
+            MiniJavaVar newVar = makeInit(ctx, classes, type);
+            if(newVar.isError()) return MiniJavaVar.makeError();
+            ((MiniJavaInstance)newVar.value).varCtx = new MiniJavaVarCtx();
+            return newVar;
         }
     }
 
-    public static MiniJavaVar makeInit(String type) { return new MiniJavaVar(type, null); }
+    public static MiniJavaVar makeInit(ParserRuleContext ctx, HashMap<String, MiniJavaClass> classes, String type) {
+        if(isArrayType(type) || type.equals("int") || type.equals("boolean"))
+            return new MiniJavaVar(type, null);
+
+        MiniJavaClass klass = classes.get(type);
+        if(klass == null) {
+            CliUtil.err(ctx, String.format("class '%s' undefined", type));
+            return MiniJavaVar.makeError();
+        }
+
+        MiniJavaInstance inst = new MiniJavaInstance();
+        inst.klass = klass;
+        return new MiniJavaVar(type, inst);
+    }
 
     public static MiniJavaVar makeNewObj(String newTypeName, MiniJavaVar objToPoint) {
-        if(objToPoint.value == null) return makeInit(newTypeName);
+        if(objToPoint.value == null) return new MiniJavaVar(newTypeName, null);
         if(newTypeName.equals(objToPoint.type)) {
             if(objToPoint.type.equals("int")) return MiniJavaVar.makeInt((int)objToPoint.value);
             if(objToPoint.type.equals("boolean")) return MiniJavaVar.makeBool((boolean)objToPoint.value);
             return objToPoint;
         }
-        MiniJavaVar res = makeInit(newTypeName);
+        MiniJavaVar res = new MiniJavaVar(newTypeName, null);
         res.value = objToPoint.value;
         return res;
     }

@@ -15,9 +15,9 @@ public class MiniJavaVarCtxManager {
         contexts.push(new MiniJavaVarCtx());
     }
 
-    public void createInstanceCtx(MiniJavaInstance inst) {
+    /*public void createInstanceCtx(MiniJavaInstance inst) {
         contexts.push(inst.varCtx);
-    }
+    }*/
 
     public void exitBlock() {
         contexts.pop();

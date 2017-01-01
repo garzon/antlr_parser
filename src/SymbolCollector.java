@@ -54,7 +54,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         currentClass.ctx = null;
 
         varCtx.enterBlock();
-        varCtx.declareVar(ctx.args.getText(), MiniJavaVar.makeInitVar("String[]"));
+        varCtx.declareVar(ctx.args.getText(), MiniJavaVar.makeVoid());
         visit(ctx.stmtBlock());
         varCtx.exitBlock();
 
@@ -72,7 +72,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(varCtx.isTopLevel()) {
             currentClass.property.put(varName, varType);
         }
-        varCtx.declareVar(varName, MiniJavaVar.makeInit(varType));
+        varCtx.declareVar(varName, MiniJavaVar.makeVoid());
 
         return MiniJavaVar.makeVoid();
     }
@@ -107,7 +107,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
             varType = arg.type().getText();
             methodArgsName.add(varName);
             methodArgs.add(varType);
-            varCtx.declareVar(varName, MiniJavaVar.makeInit(varType));
+            varCtx.declareVar(varName, MiniJavaVar.makeVoid());
         }
         currentClass.methodArgs.put(methodName, methodArgs);
         currentClass.methodArgsName.put(methodName, methodArgsName);
