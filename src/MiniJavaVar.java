@@ -2,7 +2,6 @@
  * Created by ougar_000 on 2016/12/30.
  */
 
-import com.sun.istack.internal.Nullable;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.lang.*;
@@ -13,7 +12,7 @@ public class MiniJavaVar {
     public final String type;
     public Object value;
 
-    private MiniJavaVar(String _type, @Nullable Object _value) {
+    private MiniJavaVar(String _type, Object _value) {
         type = _type;
         value = _value;
     }

@@ -2,7 +2,6 @@
  * Created by ougar_000 on 2016/12/30.
  */
 
-import com.sun.istack.internal.Nullable;
 import org.antlr.v4.Tool;
 
 import java.lang.*;
