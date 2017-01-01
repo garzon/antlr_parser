@@ -1,5 +1,5 @@
 # MiniJava Interpreter
-A interpreter of (a superset of) MiniJava language powered by ANTLR V4.6
+An interpreter of (a superset of) MiniJava language powered by ANTLR V4.6
 
 ## Demo
 Input program:
@@ -55,4 +55,107 @@ Got output:
 610
 987
 [int(1), int(1), int(2), int(3), int(5), int(8), int(13), int(21), int(34), int(55), int(89), int(144), int(233), int(377), int(610), int(987)]
+```
+
+## Get Started
+
+```
+git clone https://github.com/garzon/miniJavaInterpreter.git
+cd miniJavaInterpreter
+mkdir build
+cp src/ build/ -r
+cp antlr-4.6-complete.jar build/src/
+cd build/src/
+javac -classpath ./*.jar miniJava/*.java
+javac -classpath ./*.jar *.java
+java mjava ../../exampleMiniJavaProgram.java
+```
+
+## Usage
+
+`java mjava MINIJAVA_SOURCE [OPTION=--tree]`
+- Run mini java program without any OPTION
+- Print the lisp-style AST with `--tree` option
+
+## Grammar
+
+```
+grammar MiniJava;
+
+goal : mainClass (classDeclaration)* EOF;
+
+mainClass : 'class' className=ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' args=ID ')' stmtBlock '}' ;
+
+classDeclaration : 'class' className=ID ('extends' parentName=ID)? '{' (declaration)* '}' ;
+declaration : propertyDeclaration | methodDeclaration ;
+propertyDeclaration : varDeclaration ;
+varDeclaration : type ID ('=' exp)? ';' ;
+permissionDesc : 'public' | 'private' ;
+argPair : type ID ;
+methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (argPair (',' argPair)* )? ')' stmtBlock ;
+
+type : arrType | basicType;
+arrType : basicType '[' ']' ;
+basicType : 'boolean' | 'int' | 'void' | ID;
+
+stmtBlock : '{' (stmt)* '}' ;
+
+assignSym : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&='
+    | '|=' | '^=' | '<<=' | '>>=' | '>>>='
+;
+
+stmtBody : ID assignSym v=exp #assign
+    | ID '[' idx=exp ']' assignSym v=exp #setIndexOf
+    | exp #stmtExp
+    | 'return' exp #return
+;
+
+stmt : varDeclaration #var
+    | stmtBlock #block
+    | 'if' '(' exp ')' t_stmt=stmt ('else' f_stmt=stmt)? #if
+    | 'while' '(' exp ')' stmt #while
+    | 'for' '(' start_stmt=stmt exp ';' step_stmt=stmtBody ')' body=stmt #for
+    | systemCallName='System.out.println' '(' exp ')' ';' #systemCall
+    | stmtBody ';' #normalStmt
+    | ';' #emptyStmt
+;
+
+exp : intLiteral #literal
+    | boolLiteral #literal
+    | '(' exp ')' #dummy
+
+    | id=exp '.' ID '(' (exp (',' exp)* )? ')' #getMethod
+    | id=exp '.' 'length' #getLength
+    | id=exp '.' ID #getProperty
+    | id=exp '[' idx=exp ']' #indexOf
+
+    | op=('!' | '+' | '-' | '~') first=exp #unaryOp
+    | first=exp op=('*' | '/' | '%') second=exp #binaryOp
+    | first=exp op=('+' | '-') second=exp #binaryOp
+    | first=exp op=('<<' | '>>' | '>>>') second=exp #binaryOp
+    | first=exp op=('<' | '>' | '<=' | '>=' | 'instanceof') second=exp #binaryOp
+    | first=exp op=('==' | '!=') second=exp #binaryOp
+    | first=exp op='&' second=exp #binaryOp
+    | first=exp op='^' second=exp #binaryOp
+    | first=exp op='|' second=exp #binaryOp
+    | first=exp op='&&' second=exp #logicBinaryOp
+    | first=exp op='||' second=exp #logicBinaryOp
+    | first=exp op='?' second=exp ':' third=exp #ternaryOp
+
+    | 'this' #this
+    | 'new' basicType '[' exp ']' #newArr
+    | 'new' ID '(' ')' #newExp
+    | ID #id
+;
+
+boolLiteral : 'true' | 'false' ;
+intLiteral : INT_HEX | INT_BIN | INT_DEC ;
+
+ID : [a-zA-Z_][a-zA-Z_0-9]* ;
+INT_HEX : '0x'[0-9a-fA-F]+ ;
+INT_BIN : '0b'[01]+;
+INT_DEC : [0-9]+ ;
+
+WS : [ \t\r\n]+ -> skip ;
+COMMENT : '//'~[\r\n]* -> skip;
 ```

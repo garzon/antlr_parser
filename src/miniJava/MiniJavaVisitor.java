@@ -1,4 +1,4 @@
-// Generated from D:/ÎÄµµ/ÎÒÔÚFDU/MiniJavaCompilerProject/src\MiniJava.g4 by ANTLR 4.6
+// Generated from D:/æ–‡æ¡£/æˆ‘åœ¨FDU/MiniJavaCompilerProject/src\MiniJava.g4 by ANTLR 4.6
 package miniJava;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
