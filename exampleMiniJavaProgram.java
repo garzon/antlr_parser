@@ -1,9 +1,3 @@
-# MiniJava Interpreter
-A interpreter of (a superset of) MiniJava language powered by ANTLR V4.6
-
-## Demo
-Input program:
-```java
 class MiniJava {
     public static void main(String[] args) {
         Seq seq = new Seq().Seq(15);
@@ -34,25 +28,3 @@ class Seq {
         fib_saver[i] = fib_saver[i-1] + fib_saver[i-2];
     }
 }
-```
-
-Got output:
-```
-1
-1
-2
-3
-5
-8
-13
-21
-34
-55
-89
-144
-233
-377
-610
-987
-[int(1), int(1), int(2), int(3), int(5), int(8), int(13), int(21), int(34), int(55), int(89), int(144), int(233), int(377), int(610), int(987)]
-```

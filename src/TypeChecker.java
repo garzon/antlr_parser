@@ -448,7 +448,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             addPropertyOfClass(ctx, parentClass, inst);
         }
         for(String propName: klass.property.keySet()) {
-            inst.varCtx.vars.put(propName, makeInit(ctx, klass.property.get(propName)));
+            inst.varCtx.vars.put(propName, makeInitVar(ctx, klass.property.get(propName)));
         }
         return MiniJavaVar.makeVoid();
     }
@@ -581,7 +581,11 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         }
 
         String retType = method.returnType.getText();
-        return makeInitVar(ctx, retType);
+        MiniJavaVar res = makeInitVar(ctx, retType);
+        if(res.value instanceof MiniJavaInstance) {
+            res = createInstance(ctx, retType);
+        }
+        return res;
     }
 
     private boolean divBy0(MiniJavaParser.BinaryOpContext ctx, int vNotZero) {
