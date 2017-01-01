@@ -1,5 +1,4 @@
 import java.lang.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -169,7 +168,7 @@ public class Evaluator extends TypeChecker {
     }
 
     private MiniJavaVar outOfRangeError(ParserRuleContext ctx) {
-        hasSyntaxError = true;
+        hasError = true;
         return CliUtil.err(ctx, "index out of range.");
     }
 
@@ -227,7 +226,7 @@ public class Evaluator extends TypeChecker {
         for(int i=0; i<(int)v.value; i++) {
             MiniJavaVar ele = MiniJavaVar.makeInitVar(ctx, classes, ctx.basicType().getText());
             /*if(ele.isError()) {
-                hasSyntaxError = true;
+                hasError = true;
                 return CliUtil.err(ctx, "Array of array is not supported yet.");
             }*/
             vec.add(ele);
@@ -287,7 +286,7 @@ public class Evaluator extends TypeChecker {
         if(id.type.equals("0this")) {
             if(currentClass == null) {
                 // is null when in main class
-                hasSyntaxError = true;
+                hasError = true;
                 return CliUtil.err(ctx, "calling 'this' in mainClass is not supported yet.");
             }
             klass = currentClass;
@@ -317,7 +316,7 @@ public class Evaluator extends TypeChecker {
         if(permission.equals("private")) {
             if(!id.type.equals("0this") && !currentClassName.equals(id.type)) {
                 assert (false);
-                /*hasSyntaxError = true;
+                /*hasError = true;
                 return CliUtil.err(ctx, String.format("Cannot access private method '%s.%s'.", id.type, methodName));*/
             }
         }
@@ -326,7 +325,7 @@ public class Evaluator extends TypeChecker {
         int n = argsName.size();
         if(sendingArgs.size()-1 != n) {
             assert (false);
-            /*hasSyntaxError = true;
+            /*hasError = true;
             return CliUtil.err(ctx, String.format("Number of args(%d) for calling method '%s.%s' should be %d.",
                     sendingArgs.size()-1, id.type, methodName, n));*/
         }

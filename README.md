@@ -59,6 +59,8 @@ Got output:
 
 ## Get Started
 
+Platform:
+Linux 3.19.0-69-generic #77~14.04.1-Ubuntu x86_64 GNU/Linux
 java/javac version 1.7.0_55
 
 ```

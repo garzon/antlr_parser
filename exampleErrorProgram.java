@@ -1,10 +1,19 @@
+
 class MiniJava {
     public static void main(String[] args) {
-        Seq seq = new Seq().Seq(15);
+        Seq err = new Seq().Seq(false);
+        Seq seq = new Seq().Seq(20);
+        int k
         int l;
         for(l=0; l<=15; l+=1)
-            System.out.println(seq.get_fib(l));
-        System.out.println(seq.fib_saver);
+            System.out.println(seq.get_fib(l);
+        System.out.println seq.calc_fib(10);
+        seq.fib_saver = new int[100];
+        int z = seq.do_not_exist;
+        int shouldBeBool = 1;
+        if(shouldBeBool) {
+            int m = l.length;
+        }
     }
 }
 
@@ -28,4 +37,18 @@ class Seq {
     private void calc_fib(int i) {
         fib_saver[i] = fib_saver[i-1] + fib_saver[i-2];
     }
+    
+    private void calc_fib() {
+        // error. overloaded.
+    }
 }
+
+class Seq {
+    int a;int a;
+    int a;int a;
+    int a;int a;
+    int a;int a;
+    int a;int a;
+}
+
+%%%

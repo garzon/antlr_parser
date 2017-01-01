@@ -8,7 +8,7 @@ import java.util.*;
  * Created by ougar_000 on 2016/12/30.
  */
 public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
-    public boolean hasSyntaxError = false;
+    public boolean hasError = false;
     public HashMap<String, MiniJavaClass> classes = new HashMap<>();
 
     protected String currentClassName, currentMethodName, mainClassName;
@@ -24,14 +24,14 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected MiniJavaVar makeInit(ParserRuleContext ctx, String type) {
         MiniJavaVar res = MiniJavaVar.makeInit(ctx, classes, type);
         if(res.isError())
-            hasSyntaxError = true;
+            hasError = true;
         return res;
     }
 
     protected MiniJavaVar makeInitVar(ParserRuleContext ctx, String type) {
         MiniJavaVar res = MiniJavaVar.makeInitVar(ctx, classes, type);
         if(res.isError())
-            hasSyntaxError = true;
+            hasError = true;
         return res;
     }
 
@@ -52,7 +52,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected boolean isArrayType(ParserRuleContext ctx, String type) {
         if(!MiniJavaVar.isArrayType(type)) {
             CliUtil.err(ctx, String.format("Type error: Array expected, got '%s'", type));
-            hasSyntaxError = true;
+            hasError = true;
             return false;
         }
         return true;
@@ -61,7 +61,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected boolean matchType(ParserRuleContext ctx, String type1, String type2) {
         if(!type1.equals(type2) && !MiniJavaVar.isParentClassOf(classes, type2, type1)) {
             CliUtil.err(ctx, String.format("Type error: '%s' expected, got '%s'", type2, type1));
-            hasSyntaxError = true;
+            hasError = true;
             return false;
         }
         return true;
@@ -70,7 +70,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected boolean checkUnaryOprType(MiniJavaParser.UnaryOpContext ctx, String type1, String type2) {
         if(!type1.equals(type2)) {
             CliUtil.err(ctx, String.format("unaryOp '%s': unexpected type '%s', '%s' expected", ctx.op.getText(), ctx.getText(), type1, type2));
-            hasSyntaxError = true;
+            hasError = true;
             return false;
         }
         return true;
@@ -79,7 +79,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected boolean checkAssignOprType(MiniJavaParser.AssignContext ctx, String type1, String type2) {
         if(!type1.equals(type2) && !MiniJavaVar.isParentClassOf(classes, type2, type1)) {
             CliUtil.err(ctx, String.format("Assignment '%s': unexpected type '%s', '%s' expected", ctx.assignSym().getText(), type1, type2));
-            hasSyntaxError = true;
+            hasError = true;
             return false;
         }
         return true;
@@ -88,27 +88,27 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected boolean checkBinaryOprType(MiniJavaParser.BinaryOpContext ctx, String type1, String type2) {
         if(!type1.equals(type2)) {
             CliUtil.err(ctx, String.format("binaryOp '%s': operand type '%s' not match '%s'", ctx.op.getText(), type1, type2));
-            hasSyntaxError = true;
+            hasError = true;
             return false;
         }
         return true;
     }
 
     protected MiniJavaVar opNotImplemented(ParserRuleContext ctx, String op) {
-        hasSyntaxError = true;
-        return CliUtil.err(ctx, String.format("Op %s is not implemented yet", op));
+        hasError = true;
+        return CliUtil.err(ctx, String.format("Op %s is not implemented yet", op), "Syntax");
     }
 
     protected MiniJavaClass classFoundOrNot(ParserRuleContext ctx, String className) {
         MiniJavaClass res = classes.get(className);
         if(className.equals(mainClassName)) {
-            CliUtil.err(ctx, "refer to mainClass is not supported yet.");
-            hasSyntaxError = true;
+            CliUtil.err(ctx, "refer to mainClass is not supported yet.", "Syntax");
+            hasError = true;
             return null;
         }
         if(res == null) {
-            CliUtil.err(ctx, "undefined class " + className);
-            hasSyntaxError = true;
+            CliUtil.err(ctx, "undefined class " + className, "Syntax");
+            hasError = true;
         }
         return res;
     }
@@ -128,8 +128,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             }
         }
         if(findRes == null) {
-            CliUtil.err(ctx, String.format("Method '%s.%s' not found.", klass.name, methodName));
-            hasSyntaxError = true;
+            CliUtil.err(ctx, String.format("Method '%s.%s' not found.", klass.name, methodName), "Syntax");
+            hasError = true;
         }
         return findRes;
     }
@@ -147,8 +147,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
                     return findRes;
                 }
             }
-            hasSyntaxError = true;
-            return CliUtil.err(ctx, String.format("Identifier '%s' not found.", id));
+            hasError = true;
+            return CliUtil.err(ctx, String.format("Identifier '%s' not found.", id), "Syntax");
         }
         return findRes;
     }
@@ -156,8 +156,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected MiniJavaVar propertyFoundOrNot(ParserRuleContext ctx, MiniJavaInstance inst, String propName) {
         MiniJavaVar findRes = inst.varCtx.vars.get(propName);
         if(findRes == null) {
-            hasSyntaxError = true;
-            return CliUtil.err(ctx, String.format("Property '%s' of class '%s' not found.", propName, inst.klass.name));
+            hasError = true;
+            return CliUtil.err(ctx, String.format("Property '%s' of class '%s' not found.", propName, inst.klass.name), "Syntax");
         }
         return findRes;
     }
@@ -170,7 +170,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         if(currentClass.parentClassName != null) {
             if(classFoundOrNot(ctx, currentClass.parentClassName) == null) {
-                hasSyntaxError = true;
+                hasError = true;
                 currentClass = null;
                 currentClassName = null;
                 return MiniJavaVar.makeError();
@@ -323,7 +323,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     protected boolean isUsedBeforeInit(ParserRuleContext ctx, MiniJavaVar v, String id) {
         if(v.value == null) {
-            hasSyntaxError = true;
+            hasError = true;
             CliUtil.err(ctx, String.format("Variable '%s' used before being initialized.", id));
             return true;
         }
@@ -428,7 +428,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     @Override public MiniJavaVar visitThis(MiniJavaParser.ThisContext ctx) {
         if(thisVal == null) {
-            return CliUtil.err(ctx, "[Runtime] Access 'this' in mainClass is not supported yet.");
+            return CliUtil.err(ctx, "Access 'this' in mainClass is not supported yet.");
         }
         return thisVal;
     }
@@ -526,7 +526,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(id.type.equals("0this")) {
             if(currentClass == null) {
                 // is null when in main class
-                hasSyntaxError = true;
+                hasError = true;
                 return CliUtil.err(ctx, "calling 'this' in mainClass is not supported yet.");
             }
             klass = currentClass;
@@ -554,7 +554,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         if(permission.equals("private")) {
             if(!id.type.equals("0this") && !currentClassName.equals(realObjType)) {
-                hasSyntaxError = true;
+                hasError = true;
                 return CliUtil.err(ctx, String.format("Cannot access private method '%s.%s'.", id.type, methodName));
             }
         }
@@ -562,9 +562,9 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         List<MiniJavaParser.ExpContext> sendingArgs = ctx.exp();
         int n = args.size();
         if(sendingArgs.size()-1 != n) {
-            hasSyntaxError = true;
+            hasError = true;
             return CliUtil.err(ctx, String.format("Number of args(%d) for calling method '%s.%s' should be %d.",
-                    sendingArgs.size()-1, id.type, methodName, n));
+                    sendingArgs.size()-1, id.type, methodName, n), "Syntax");
         }
 
         int i = 0;
@@ -591,7 +591,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     private boolean divBy0(MiniJavaParser.BinaryOpContext ctx, int vNotZero) {
         if(vNotZero == 0) {
             CliUtil.err(ctx, String.format("Op '%s': divided by zero", ctx.op.getText()));
-            hasSyntaxError = true;
+            hasError = true;
             return true;
         }
         return false;

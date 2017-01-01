@@ -25,6 +25,7 @@ assignSym : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&='
 stmtBody : ID assignSym v=exp #assign
     | ID '[' idx=exp ']' assignSym v=exp #setIndexOf
     | exp #stmtExp
+    | prop=exp assignSym exp #assignToExp
     | 'return' exp #return
 ;
 
@@ -33,9 +34,11 @@ stmt : varDeclaration #var
     | 'if' '(' exp ')' t_stmt=stmt ('else' f_stmt=stmt)? #if
     | 'while' '(' exp ')' stmt #while
     | 'for' '(' start_stmt=stmt exp ';' step_stmt=stmtBody ')' body=stmt #for
-    | systemCallName='System.out.println' '(' exp ')' ';' #systemCall
+    | systemCallName='System.out.println' lpar='(' exp rpar=')' ';' #systemCall
+    | systemCallName='System.out.println' exp ';' #systemCall
     | stmtBody ';' #normalStmt
     | ';' #emptyStmt
+    | stmtBody #missingSemicolon
 ;
 
 exp : intLiteral #literal
@@ -69,10 +72,12 @@ exp : intLiteral #literal
 boolLiteral : 'true' | 'false' ;
 intLiteral : INT_HEX | INT_BIN | INT_DEC ;
 
-ID : [a-zA-Z_][a-zA-Z_0-9]* ;
+WS : [ \t\r\n]+ -> skip ;
+COMMENT : '//'~[\r\n]* -> skip;
+
 INT_HEX : '0x'[0-9a-fA-F]+ ;
 INT_BIN : '0b'[01]+;
 INT_DEC : [0-9]+ ;
 
-WS : [ \t\r\n]+ -> skip ;
-COMMENT : '//'~[\r\n]* -> skip;
+ID : [a-zA-Z_][a-zA-Z_0-9]*;
+UNKNOWN : ~[a-zA-Z_0-9 \t\r\n]+ ;

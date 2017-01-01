@@ -16,7 +16,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
 
     private boolean checkRedefinedClass(ParserRuleContext ctx) {
         if(classes.get(currentClassName) != null) {
-            CliUtil.err(ctx, "redefine class " + currentClassName);
+            CliUtil.err(ctx, "redefine class " + currentClassName, "Syntax");
             hasSyntaxError = true;
             return true;
         }
@@ -65,7 +65,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         String varName = ctx.ID().getText();
         String varType = ctx.type().getText();
         if(varCtx.isRedefinedVar(varName)) {
-            CliUtil.err(ctx, String.format("Redefine variable '%s' of type '%s'", varName, varType));
+            CliUtil.err(ctx, String.format("Redefine variable '%s' of type '%s'", varName, varType), "Syntax");
             hasSyntaxError = true;
             return MiniJavaVar.makeError();
         }
@@ -92,7 +92,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         if(currentClass.methods.get(methodName) != null) {
             hasSyntaxError = true;
-            return CliUtil.err(ctx, "overloaded methods are not supported yet.");
+            return CliUtil.err(ctx, "overloaded methods are not supported yet.", "Syntax");
         }
         currentClass.methods.put(methodName, ctx);
         currentClass.methodPermission.put(methodName, permission);
@@ -119,4 +119,16 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         return res;
     }
 
+    // checking syntax
+    @Override public MiniJavaVar visitAssignToExp(MiniJavaParser.AssignToExpContext ctx) {
+        hasSyntaxError = true;
+        return CliUtil.err(ctx.prop, "Assignment to an expression is not supported. Please omit 'this.' when changing property.", "Syntax");
+    }
+
+    @Override public MiniJavaVar visitSystemCall(MiniJavaParser.SystemCallContext ctx) {
+        if(ctx.lpar == null) {
+            CliUtil.warn(ctx, "Missing '(' and ')' when calling 'println'");
+        }
+        return MiniJavaVar.makeVoid();
+    }
 }

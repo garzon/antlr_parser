@@ -220,6 +220,18 @@ public class MiniJavaBaseListener implements MiniJavaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAssignToExp(MiniJavaParser.AssignToExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAssignToExp(MiniJavaParser.AssignToExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterReturn(MiniJavaParser.ReturnContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -323,6 +335,18 @@ public class MiniJavaBaseListener implements MiniJavaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitEmptyStmt(MiniJavaParser.EmptyStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMissingSemicolon(MiniJavaParser.MissingSemicolonContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMissingSemicolon(MiniJavaParser.MissingSemicolonContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

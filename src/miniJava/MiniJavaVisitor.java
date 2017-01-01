@@ -116,6 +116,13 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStmtExp(MiniJavaParser.StmtExpContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code assignToExp}
+	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignToExp(MiniJavaParser.AssignToExpContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code return}
 	 * labeled alternative in {@link MiniJavaParser#stmtBody}.
 	 * @param ctx the parse tree
@@ -178,6 +185,13 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitEmptyStmt(MiniJavaParser.EmptyStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code missingSemicolon}
+	 * labeled alternative in {@link MiniJavaParser#stmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMissingSemicolon(MiniJavaParser.MissingSemicolonContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code binaryOp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
