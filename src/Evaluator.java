@@ -23,18 +23,13 @@ public class Evaluator extends TypeChecker {
         return super.visitMainClass(ctx);
     }
 
-    @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
-        String varName = ctx.ID().getText();
-        String varType = ctx.type().getText();
-        MiniJavaVar v = MiniJavaVar.makeInit(varType);
-        if(ctx.exp() != null) {
-            v = visit(ctx.exp());
-            if(v.isError()) return MiniJavaVar.makeError();
-            //if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
-            assert (matchType(ctx, v.type, varType));
-        }
-        varCtx.declareVar(varName, MiniJavaVar.makeNewObj(varType, v));
+    @Override public MiniJavaVar visitPropertyDeclaration(MiniJavaParser.PropertyDeclarationContext ctx) {
+        assert (false);
         return MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
+        return super.visitVarDeclaration(ctx);
     }
 
     @Override public MiniJavaVar visitStmtBlock(MiniJavaParser.StmtBlockContext ctx) {
@@ -140,8 +135,11 @@ public class Evaluator extends TypeChecker {
         //if(isUsedBeforeInit(ctx, v, ctx.exp().getText())) return MiniJavaVar.makeError();
 
         assert (checkAssignOprType(ctx, v.type, findRes.type));
-        if(assignSym.equals("="))
-            return varCtx.assignVar(id, MiniJavaVar.makeNewObj(findRes.type, v));
+        if(assignSym.equals("=")) {
+            //return varCtx.assignVar(id, MiniJavaVar.makeNewObj(findRes.type, v));
+            findRes.value = v.value;
+            return MiniJavaVar.makeVoid();
+        }
 
         assert (checkAssignOprType(ctx, findRes.type, "int"));// return MiniJavaVar.makeError();
         if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }

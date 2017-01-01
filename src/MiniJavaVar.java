@@ -6,9 +6,10 @@ import com.sun.istack.internal.Nullable;
 
 import java.lang.*;
 import java.util.HashMap;
+import java.util.Vector;
 
 public class MiniJavaVar {
-    public String type;
+    public final String type;
     public Object value;
 
     public MiniJavaVar(String _type, @Nullable Object _value) {
@@ -51,18 +52,27 @@ public class MiniJavaVar {
 
     public static MiniJavaVar makeInitVar(String type) {
         if(isArrayType(type)) {
-            return makeNewObj(type, makeInit(type));
+            MiniJavaVar arr = makeInit(type);
+            arr.value = new Vector<MiniJavaVar>();
+            return arr;
         } else {
             if(type.equals("int")) return makeInt(0);
             if(type.equals("boolean")) return makeBool(false);
-            return makeNewObj(type, makeInit(type));
+            MiniJavaVar inst = makeInit(type);
+            inst.value = new MiniJavaInstance();
+            return inst;
         }
     }
 
     public static MiniJavaVar makeInit(String type) { return new MiniJavaVar(type, null); }
 
     public static MiniJavaVar makeNewObj(String newTypeName, MiniJavaVar objToPoint) {
-        if(newTypeName.equals(objToPoint.type)) return objToPoint;
+        if(objToPoint.value == null) return makeInit(newTypeName);
+        if(newTypeName.equals(objToPoint.type)) {
+            if(objToPoint.type.equals("int")) return MiniJavaVar.makeInt((int)objToPoint.value);
+            if(objToPoint.type.equals("boolean")) return MiniJavaVar.makeBool((boolean)objToPoint.value);
+            return objToPoint;
+        }
         MiniJavaVar res = makeInit(newTypeName);
         res.value = objToPoint.value;
         return res;

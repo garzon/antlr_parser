@@ -125,6 +125,15 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected MiniJavaVar idFoundOrNot(ParserRuleContext ctx, MiniJavaVarCtxManager varCtx, String id) {
         MiniJavaVar findRes = varCtx.findVar(id);
         if(findRes == null) {
+            // find in 'this' instance context in the case of omiting 'this' pointer
+            if(thisVal != null) {
+                assert (thisVal.value instanceof MiniJavaInstance);
+                findRes = ((MiniJavaInstance)thisVal.value).varCtx.vars.get(id);
+                if(findRes != null) {
+                    //CliUtil.warn(ctx, String.format("Should add 'this.' before the identifier '%s'", id));
+                    return findRes;
+                }
+            }
             hasSyntaxError = true;
             return CliUtil.err(ctx, String.format("Identifier '%s' not found.", id));
         }
@@ -141,6 +150,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
+        //System.err.println(ctx.getText());
         currentClassName = ctx.className.getText();
         currentClass = classFoundOrNot(ctx, currentClassName);
         assert (currentClass != null); // all classes except mainClass should have been collected in collector
@@ -180,15 +190,36 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return MiniJavaVar.makeVoid();
     }
 
-    @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
-        String varName = ctx.ID().getText();
-        String varType = ctx.type().getText();
-        if(ctx.exp() != null) {
-            MiniJavaVar v = visit(ctx.exp());
+    @Override public MiniJavaVar visitPropertyDeclaration(MiniJavaParser.PropertyDeclarationContext ctx) {
+        String varName = ctx.varDeclaration().ID().getText();
+        String varType = ctx.varDeclaration().type().getText();
+
+        MiniJavaVar v = MiniJavaVar.makeInit(varType);
+        if(ctx.varDeclaration().exp() != null) {
+            v = visit(ctx.varDeclaration().exp());
             if(v.isError()) return MiniJavaVar.makeError();
             if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
         }
-        varCtx.declareVar(varName, MiniJavaVar.makeInit(varType));
+        assert (thisVal.value != null);
+        assert (thisVal.value instanceof MiniJavaInstance);
+
+        ((MiniJavaInstance)thisVal.value).varCtx.vars.put(varName, MiniJavaVar.makeNewObj(varType, v));
+
+        return MiniJavaVar.makeVoid();
+    }
+
+    @Override public MiniJavaVar visitVarDeclaration(MiniJavaParser.VarDeclarationContext ctx) {
+        String varName = ctx.ID().getText();
+        String varType = ctx.type().getText();
+
+        MiniJavaVar v = MiniJavaVar.makeInit(varType);
+        if(ctx.exp() != null) {
+            v = visit(ctx.exp());
+            if(v.isError()) return MiniJavaVar.makeError();
+            if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
+        }
+        varCtx.declareVar(varName, MiniJavaVar.makeNewObj(varType, v));
+
         return MiniJavaVar.makeVoid();
     }
 
@@ -300,7 +331,11 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(v.isError()) return v;
 
         if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
-        if(assignSym.equals("=")) return varCtx.assignVar(id, mockVar(findRes));
+        if(assignSym.equals("=")) {
+            findRes.value = mockVar(findRes).value;
+            //return varCtx.assignVar(id, mockVar(findRes));
+            return MiniJavaVar.makeVoid();
+        }
 
         if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
         if(assignSym.equals("*=") ||

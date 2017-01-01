@@ -10,6 +10,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class CliUtil {
+    public static boolean isRuntime = false;
+
     public static Vector<Token> getFirst10Tokens(ParserRuleContext ctx) {
         Vector<Token> tokens = new Vector<>();
         Iterator itr = ctx.children.iterator();
@@ -25,6 +27,23 @@ public class CliUtil {
         return tokens;
     }
 
+    public static MiniJavaVar warn(ParserRuleContext ctx, String msg) {
+        if(isRuntime) return MiniJavaVar.makeVoid();
+
+        Token firstToken = ctx.getStart();
+        String sourceContext = "";
+        for(Token token: getFirst10Tokens(ctx)) {
+            sourceContext += token.getText() + " ";
+        }
+        // sourceContext += "...";
+        System.err.printf("[WARN] Line %d, Char %d, '%s':\n\t%s\n",
+                firstToken.getLine(),
+                firstToken.getCharPositionInLine(),
+                sourceContext, msg);
+
+        return MiniJavaVar.makeError();
+    }
+
     public static MiniJavaVar err(ParserRuleContext ctx, String msg) {
         Token firstToken = ctx.getStart();
         String sourceContext = "";
@@ -32,8 +51,12 @@ public class CliUtil {
             sourceContext += token.getText() + " ";
         }
         // sourceContext += "...";
-        System.err.printf("[ERR] Line %d, Char %d, '%s':\n\t%s\n", firstToken.getLine(), firstToken.getCharPositionInLine(),
+        System.err.printf("[%sERR] Line %d, Char %d, '%s':\n\t%s\n",
+                isRuntime ? "Runtime " : "",
+                firstToken.getLine(),
+                firstToken.getCharPositionInLine(),
                 sourceContext, msg);
+
         return MiniJavaVar.makeError();
     }
 
