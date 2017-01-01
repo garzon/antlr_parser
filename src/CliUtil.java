@@ -36,4 +36,14 @@ public class CliUtil {
                 sourceContext, msg);
         return MiniJavaVar.makeError();
     }
+
+    public static void printCtx(ParserRuleContext ctx) {
+        Token firstToken = ctx.getStart();
+        String sourceContext = "";
+        for(Token token: getFirst10Tokens(ctx)) {
+            sourceContext += token.getText() + " ";
+        }
+        System.out.printf("[Info] Line %d, Char %d, '%s': %s\n", firstToken.getLine(), firstToken.getCharPositionInLine(),
+                sourceContext, ctx.getText());
+    }
 }

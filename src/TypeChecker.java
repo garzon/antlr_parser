@@ -28,7 +28,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     protected boolean isArrayType(ParserRuleContext ctx, String type) {
-        if(!type.endsWith("[]")) {
+        if(!MiniJavaVar.isArrayType(type)) {
             CliUtil.err(ctx, String.format("Type error: Array expected, got '%s'", type));
             hasSyntaxError = true;
             return false;
@@ -200,7 +200,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             String varName, varType;
             varName = arg.ID().getText();
             varType = arg.type().getText();
-            varCtx.declareVar(varName, MiniJavaVar.makeInit(varType));
+            varCtx.declareVar(varName, MiniJavaVar.makeInitVar(varType));
         }
 
         currentMethodName = ctx.methodName.getText();
@@ -266,6 +266,15 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return v;
     }
 
+    protected boolean isUsedBeforeInit(ParserRuleContext ctx, MiniJavaVar v, String id) {
+        if(v.value == null) {
+            hasSyntaxError = true;
+            CliUtil.err(ctx, String.format("Variable '%s' used before being initialized.", id));
+            return true;
+        }
+        return false;
+    }
+
     @Override public MiniJavaVar visitAssign(MiniJavaParser.AssignContext ctx) {
         String assignSym = ctx.assignSym().getText();
         String id = ctx.ID().getText();
@@ -273,11 +282,15 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar findRes = idFoundOrNot(ctx, varCtx, id);
         if(findRes.isError()) return findRes;
 
+        if(!assignSym.equals("=")) {
+            if(isUsedBeforeInit(ctx, findRes, id)) return MiniJavaVar.makeError();
+        }
+
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
 
         if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
-        if(assignSym.equals("=")) return MiniJavaVar.makeVoid();
+        if(assignSym.equals("=")) return varCtx.assignVar(id, v);
 
         if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
         if(assignSym.equals("*=") ||
@@ -518,6 +531,10 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             return true;
         }
         return false;
+    }
+
+    @Override public MiniJavaVar visitDummy(MiniJavaParser.DummyContext ctx) {
+        return visit(ctx.exp());
     }
 
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {

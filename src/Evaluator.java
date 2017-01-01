@@ -130,14 +130,14 @@ public class Evaluator extends TypeChecker {
         //if(findRes.isError()) return findRes;
         assert (!findRes.isError());
 
+        //CliUtil.printCtx(ctx);
         if(!assignSym.equals("=")) {
-            if(findRes.value == null) {
-                return CliUtil.err(ctx, String.format("Variable '%s' used before being initialized.\n", id));
-            }
+            if(isUsedBeforeInit(ctx, findRes, id)) return MiniJavaVar.makeError();
         }
 
         MiniJavaVar v = visit(ctx.exp());
         if(v.isError()) return v;
+        //if(isUsedBeforeInit(ctx, v, ctx.exp().getText())) return MiniJavaVar.makeError();
 
         assert (checkAssignOprType(ctx, v.type, findRes.type));
         if(assignSym.equals("=")) return varCtx.assignVar(id, v);
@@ -226,7 +226,12 @@ public class Evaluator extends TypeChecker {
         MiniJavaVar res = MiniJavaVar.makeInit(ctx.basicType().getText() + "[]");
         Vector<MiniJavaVar> vec = new Vector<>();
         for(int i=0; i<(int)v.value; i++) {
-            vec.add(MiniJavaVar.makeInit(ctx.basicType().getText()));
+            MiniJavaVar ele = MiniJavaVar.makeInitVar(ctx.basicType().getText());
+            /*if(ele.isError()) {
+                hasSyntaxError = true;
+                return CliUtil.err(ctx, "Array of array is not supported yet.");
+            }*/
+            vec.add(ele);
         }
         res.value = vec;
 
@@ -245,6 +250,8 @@ public class Evaluator extends TypeChecker {
         MiniJavaVar arr = visit(ctx.id);
         if(arr.isError()) return arr;
         assert (isArrayType(ctx, arr.type));// return MiniJavaVar.makeError();
+
+        if(isUsedBeforeInit(ctx, arr, ctx.id.getText())) return MiniJavaVar.makeError();
 
         MiniJavaVar idx = visit(ctx.idx);
         if(idx.isError()) return idx;
@@ -377,21 +384,36 @@ public class Evaluator extends TypeChecker {
         return res;
     }
 
+    @Override public MiniJavaVar visitDummy(MiniJavaParser.DummyContext ctx) {
+        return super.visitDummy(ctx);
+    }
+
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
         MiniJavaVar res = visit(ctx.first);
+        if(res.isError() || isUsedBeforeInit(ctx, res, ctx.first.getText())) return MiniJavaVar.makeError();
         return unaryOp(ctx, res);
     }
 
     @Override public MiniJavaVar visitBinaryOp(MiniJavaParser.BinaryOpContext ctx) {
         MiniJavaVar first = visit(ctx.first);
+        if(first.isError() || isUsedBeforeInit(ctx, first, ctx.first.getText())) return MiniJavaVar.makeError();
         MiniJavaVar second = visit(ctx.second);
+        if(second.isError() || isUsedBeforeInit(ctx, second, ctx.second.getText())) return MiniJavaVar.makeError();
+        /*if(ctx.getText().equals("num<aux01")) {
+            System.out.println(ctx.getText());
+            System.out.println(first);
+            System.out.println(second);
+        }*/
         return binaryOp(ctx, first, second);
     }
 
     @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {
         MiniJavaVar first = visit(ctx.first);
+        if(first.isError() || isUsedBeforeInit(ctx, first, ctx.first.getText())) return MiniJavaVar.makeError();
         MiniJavaVar second = visit(ctx.second);
+        if(second.isError() || isUsedBeforeInit(ctx, second, ctx.second.getText())) return MiniJavaVar.makeError();
         MiniJavaVar third = visit(ctx.third);
+        if(third.isError() || isUsedBeforeInit(ctx, third, ctx.third.getText())) return MiniJavaVar.makeError();
         return ternaryOp(ctx, first, second, third);
     }
 

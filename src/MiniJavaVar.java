@@ -19,6 +19,10 @@ public class MiniJavaVar {
         return type.equals("0Error");
     }
 
+    public static boolean isArrayType(String type) {
+        return type.endsWith("[]");
+    }
+
     public static MiniJavaVar makeVoid() {
         return new MiniJavaVar("void", 0);
     }
@@ -32,6 +36,16 @@ public class MiniJavaVar {
     }
 
     public static MiniJavaVar makeError() { return new MiniJavaVar("0Error", 0); }
+
+    public static MiniJavaVar makeInitVar(String type) {
+        if(isArrayType(type)) {
+            return makeInit(type);
+        } else {
+            if(type.equals("int")) return makeInt(0);
+            if(type.equals("boolean")) return makeBool(false);
+            return makeInit(type);
+        }
+    }
 
     public static MiniJavaVar makeInit(String type) { return new MiniJavaVar(type, null); }
 
