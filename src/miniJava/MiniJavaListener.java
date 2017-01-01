@@ -304,18 +304,6 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitEmptyStmt(MiniJavaParser.EmptyStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code missingSemicolon}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void enterMissingSemicolon(MiniJavaParser.MissingSemicolonContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code missingSemicolon}
-	 * labeled alternative in {@link MiniJavaParser#stmt}.
-	 * @param ctx the parse tree
-	 */
-	void exitMissingSemicolon(MiniJavaParser.MissingSemicolonContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code binaryOp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
 	 * @param ctx the parse tree
@@ -363,6 +351,18 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNewExp(MiniJavaParser.NewExpContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code missingRP}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterMissingRP(MiniJavaParser.MissingRPContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code missingRP}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitMissingRP(MiniJavaParser.MissingRPContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code this}
 	 * labeled alternative in {@link MiniJavaParser#exp}.

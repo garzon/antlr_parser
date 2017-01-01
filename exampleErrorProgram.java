@@ -1,12 +1,10 @@
-
 class MiniJava {
     public static void main(String[] args) {
         Seq err = new Seq().Seq(false);
         Seq seq = new Seq().Seq(20);
-        int k
         int l;
         for(l=0; l<=15; l+=1)
-            System.out.println(seq.get_fib(l);
+            System.out.println(seq.get_fib(l));
         System.out.println seq.calc_fib(10);
         seq.fib_saver = new int[100];
         int z = seq.do_not_exist;
@@ -14,8 +12,10 @@ class MiniJava {
         if(shouldBeBool) {
             int m = l.length;
         }
+        int j = (3+(2*(4+1);
     }
 }
+
 
 class Seq {
     int[] fib_saver;
@@ -50,5 +50,3 @@ class Seq {
     int a;int a;
     int a;int a;
 }
-
-%%%

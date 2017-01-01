@@ -601,6 +601,11 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return visit(ctx.exp());
     }
 
+    @Override public MiniJavaVar visitMissingRP(MiniJavaParser.MissingRPContext ctx) {
+        CliUtil.warn(ctx, String.format("Missing ')', has been (correctly?) corrected to (%s).", ctx.exp().getText()));
+        return visit(ctx.exp());
+    }
+
     @Override public MiniJavaVar visitUnaryOp(MiniJavaParser.UnaryOpContext ctx) {
         MiniJavaVar first = mockVar(visit(ctx.first));
         return unaryOp(ctx, first);

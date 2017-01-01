@@ -1,7 +1,7 @@
 import java.lang.*;
 import java.util.*;
 import miniJava.*;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 
 /**
  * Created by ougar_000 on 2016/12/30.
@@ -23,7 +23,18 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         return false;
     }
 
+    private boolean hasUnknown(ParserRuleContext ctx, Token isUnknown) {
+        if(isUnknown != null) {
+            hasSyntaxError = true;
+            CliUtil.err(ctx, "unknown symbol detected");
+            return true;
+        }
+        return false;
+    }
+
     @Override public MiniJavaVar visitClassDeclaration(MiniJavaParser.ClassDeclarationContext ctx) {
+        //if(hasUnknown(ctx, ctx.unknown)) return MiniJavaVar.makeError();
+
         currentClassName = ctx.className.getText();
         currentClass = new MiniJavaClass();
         currentClass.name = currentClassName;

@@ -38,12 +38,12 @@ stmt : varDeclaration #var
     | systemCallName='System.out.println' exp ';' #systemCall
     | stmtBody ';' #normalStmt
     | ';' #emptyStmt
-    | stmtBody #missingSemicolon
 ;
 
 exp : intLiteral #literal
     | boolLiteral #literal
     | '(' exp ')' #dummy
+    | '(' exp #missingRP
 
     | id=exp '.' ID '(' (exp (',' exp)* )? ')' #getMethod
     | id=exp '.' 'length' #getLength
@@ -54,7 +54,7 @@ exp : intLiteral #literal
     | first=exp op=('*' | '/' | '%') second=exp #binaryOp
     | first=exp op=('+' | '-') second=exp #binaryOp
     | first=exp op=('<<' | '>>' | '>>>') second=exp #binaryOp
-    | first=exp op=('<' | '>' | '<=' | '>=' | 'instanceof') second=exp #binaryOp
+    | first=exp op=('<' | '>' | '<=' | '>=') second=exp #binaryOp
     | first=exp op=('==' | '!=') second=exp #binaryOp
     | first=exp op='&' second=exp #binaryOp
     | first=exp op='^' second=exp #binaryOp
@@ -80,4 +80,3 @@ INT_BIN : '0b'[01]+;
 INT_DEC : [0-9]+ ;
 
 ID : [a-zA-Z_][a-zA-Z_0-9]*;
-UNKNOWN : ~[a-zA-Z_0-9 \t\r\n]+ ;

@@ -92,11 +92,11 @@ public class mjava {
         };
         ParseTreeWalker.DEFAULT.walk(treeSaver, parser.goal());
 
-        /*if(parser.getNumberOfSyntaxErrors() != 0) {
+        if(parser.getNumberOfSyntaxErrors() != 0) {
             System.err.println("There are errors. Break.");
             System.exit(1);
             return;
-        }*/
+        }
 
         SymbolCollector collector = new SymbolCollector();
         collector.visit(root);
