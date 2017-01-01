@@ -54,7 +54,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         currentClass.ctx = null;
 
         varCtx.enterBlock();
-        varCtx.declareVar(ctx.args.getText(), new MiniJavaVar("String[]", null));
+        varCtx.declareVar(ctx.args.getText(), MiniJavaVar.makeInitVar("String[]"));
         visit(ctx.stmtBlock());
         varCtx.exitBlock();
 
@@ -89,10 +89,6 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         String permission = ctx.permissionDesc().getText();
 
         if(permission == null) permission = "public";
-        /*if(permission.equals("private")) {
-            hasSyntaxError = true;
-            return CliUtil.err(ctx, "private methods are not supported yet.");
-        }*/
 
         if(currentClass.methods.get(methodName) != null) {
             hasSyntaxError = true;

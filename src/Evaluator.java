@@ -33,7 +33,7 @@ public class Evaluator extends TypeChecker {
             //if(!matchType(ctx, v.type, varType)) return MiniJavaVar.makeError();
             assert (matchType(ctx, v.type, varType));
         }
-        varCtx.declareVar(varName, v);
+        varCtx.declareVar(varName, MiniJavaVar.makeNewObj(varType, v));
         return MiniJavaVar.makeVoid();
     }
 
@@ -140,7 +140,8 @@ public class Evaluator extends TypeChecker {
         //if(isUsedBeforeInit(ctx, v, ctx.exp().getText())) return MiniJavaVar.makeError();
 
         assert (checkAssignOprType(ctx, v.type, findRes.type));
-        if(assignSym.equals("=")) return varCtx.assignVar(id, v);
+        if(assignSym.equals("="))
+            return varCtx.assignVar(id, MiniJavaVar.makeNewObj(findRes.type, v));
 
         assert (checkAssignOprType(ctx, findRes.type, "int"));// return MiniJavaVar.makeError();
         if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }
@@ -292,8 +293,11 @@ public class Evaluator extends TypeChecker {
             }
             klass = currentClass;
         } else {
-            klass = classFoundOrNot(ctx, id.type);
-            if(klass == null) return MiniJavaVar.makeError();
+            //klass = classFoundOrNot(ctx, id.type);
+            //if(klass == null) return MiniJavaVar.makeError();
+            assert (id.value instanceof MiniJavaInstance);
+            klass = ((MiniJavaInstance)id.value).klass;
+            assert (klass != null);
         }
 
         // now klass must be not null
@@ -356,7 +360,7 @@ public class Evaluator extends TypeChecker {
         varCtx.createInstanceCtx((MiniJavaInstance)id.value);
         varCtx.enterBlock();
         for(i = 0; i < n; i++) {
-            varCtx.declareVar(argsName.get(i), calculatedArgs.get(i));
+            varCtx.declareVar(argsName.get(i), MiniJavaVar.makeNewObj(args.get(i), calculatedArgs.get(i)));
         }
         //System.out.printf("calling %s with ", methodName);System.out.println(calculatedArgs);
 

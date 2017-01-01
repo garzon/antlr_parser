@@ -5,6 +5,7 @@
 import com.sun.istack.internal.Nullable;
 
 import java.lang.*;
+import java.util.HashMap;
 
 public class MiniJavaVar {
     public String type;
@@ -23,6 +24,17 @@ public class MiniJavaVar {
         return type.endsWith("[]");
     }
 
+    public static boolean isParentClassOf(HashMap<String, MiniJavaClass> classes, String cl1, String cl2) {
+        if(isArrayType(cl1)) return false;
+        if(cl1.equals("int") || cl1.equals("boolean")) return false;
+        MiniJavaClass begin = classes.get(cl2);
+        while(begin != null && begin.parentClassName != null) {
+            if(begin.parentClassName.equals(cl1)) return true;
+            begin = classes.get(begin.parentClassName);
+        }
+        return false;
+    }
+
     public static MiniJavaVar makeVoid() {
         return new MiniJavaVar("void", 0);
     }
@@ -39,15 +51,22 @@ public class MiniJavaVar {
 
     public static MiniJavaVar makeInitVar(String type) {
         if(isArrayType(type)) {
-            return makeInit(type);
+            return makeNewObj(type, makeInit(type));
         } else {
             if(type.equals("int")) return makeInt(0);
             if(type.equals("boolean")) return makeBool(false);
-            return makeInit(type);
+            return makeNewObj(type, makeInit(type));
         }
     }
 
     public static MiniJavaVar makeInit(String type) { return new MiniJavaVar(type, null); }
+
+    public static MiniJavaVar makeNewObj(String newTypeName, MiniJavaVar objToPoint) {
+        if(newTypeName.equals(objToPoint.type)) return objToPoint;
+        MiniJavaVar res = makeInit(newTypeName);
+        res.value = objToPoint.value;
+        return res;
+    }
 
     public String toString() {
         return String.format("%s(%s)", type, value);

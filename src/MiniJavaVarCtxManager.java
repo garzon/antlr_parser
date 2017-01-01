@@ -40,7 +40,7 @@ public class MiniJavaVarCtxManager {
             }
         }
         assert (false);
-        return null;
+        return MiniJavaVar.makeError();
     }
 
     public MiniJavaVar findVar(String varName) {

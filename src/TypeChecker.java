@@ -24,6 +24,16 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     private static MiniJavaVar mockVar(MiniJavaVar original) {
         if(original.type.equals("boolean")) return MiniJavaVar.makeBool(true);
         if(original.type.equals("int")) return MiniJavaVar.makeInt(1);
+        if(MiniJavaVar.isArrayType(original.type)) {
+            MiniJavaVar newVar = MiniJavaVar.makeInit(original.type);
+            newVar.value = new Vector<MiniJavaVar>();
+            return newVar;
+        }
+        if(original.value == null) {
+            MiniJavaVar newVar = MiniJavaVar.makeInit(original.type);
+            newVar.value = new MiniJavaInstance();
+            return newVar;
+        }
         return original;
     }
 
@@ -37,7 +47,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     protected boolean matchType(ParserRuleContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
+        if(!type1.equals(type2) && !MiniJavaVar.isParentClassOf(classes, type2, type1)) {
             CliUtil.err(ctx, String.format("Type error: '%s' expected, got '%s'", type2, type1));
             hasSyntaxError = true;
             return false;
@@ -55,7 +65,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     protected boolean checkAssignOprType(MiniJavaParser.AssignContext ctx, String type1, String type2) {
-        if(!type1.equals(type2)) {
+        if(!type1.equals(type2) && !MiniJavaVar.isParentClassOf(classes, type2, type1)) {
             CliUtil.err(ctx, String.format("Assignment '%s': unexpected type '%s', '%s' expected", ctx.assignSym().getText(), type1, type2));
             hasSyntaxError = true;
             return false;
@@ -161,7 +171,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         currentClass = null;
 
         varCtx.enterBlock();
-        varCtx.declareVar(ctx.args.getText(), new MiniJavaVar("String[]", null));
+        varCtx.declareVar(ctx.args.getText(), MiniJavaVar.makeInitVar("String[]"));
         currentMethodName = "main";
         visit(ctx.stmtBlock());
         currentMethodName = null;
@@ -290,7 +300,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(v.isError()) return v;
 
         if(!checkAssignOprType(ctx, v.type, findRes.type)) return MiniJavaVar.makeError();
-        if(assignSym.equals("=")) return varCtx.assignVar(id, v);
+        if(assignSym.equals("=")) return varCtx.assignVar(id, mockVar(findRes));
 
         if(!checkAssignOprType(ctx, findRes.type, "int")) return MiniJavaVar.makeError();
         if(assignSym.equals("*=") ||
