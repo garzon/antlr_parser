@@ -241,9 +241,11 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         MiniJavaVar body = visit(ctx.stmtBody());
         MiniJavaVar stm = visit(ctx.step_stmt);
 
-        if(!matchType(ctx, criteria.type, "boolean")) return MiniJavaVar.makeError();
+        if(!criteria.isError())
+            if(!matchType(ctx, criteria.type, "boolean"))
+                return MiniJavaVar.makeError();
 
-        return MiniJavaVar.makeVoid();
+        return !st.isError() && !criteria.isError() && !body.isError() && !stm.isError() ? MiniJavaVar.makeVoid() : MiniJavaVar.makeError();
     }
 
     @Override public MiniJavaVar visitReturn(MiniJavaParser.ReturnContext ctx) {

@@ -103,7 +103,7 @@ public class Evaluator extends TypeChecker {
         assert (matchType(ctx, criteria.type, "boolean"));
 
         while((boolean)criteria.value) {
-            MiniJavaVar body = visit(ctx.stmtBody());
+            MiniJavaVar body = visit(ctx.body);
             if(body.isError()) return body;
 
             MiniJavaVar stm = visit(ctx.step_stmt);
