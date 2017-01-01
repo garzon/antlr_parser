@@ -58,6 +58,7 @@ public class MiniJavaVar {
         } else {
             if(type.equals("int")) return makeInt(0);
             if(type.equals("boolean")) return makeBool(false);
+            if(type.equals("void")) return makeVoid();
             MiniJavaVar newVar = makeInit(ctx, classes, type);
             if(newVar.isError()) return MiniJavaVar.makeError();
             ((MiniJavaInstance)newVar.value).varCtx = new MiniJavaVarCtx();
@@ -66,7 +67,7 @@ public class MiniJavaVar {
     }
 
     public static MiniJavaVar makeInit(ParserRuleContext ctx, HashMap<String, MiniJavaClass> classes, String type) {
-        if(isArrayType(type) || type.equals("int") || type.equals("boolean"))
+        if(isArrayType(type) || type.equals("int") || type.equals("boolean") || type.equals("void"))
             return new MiniJavaVar(type, null);
 
         MiniJavaClass klass = classes.get(type);
@@ -90,6 +91,10 @@ public class MiniJavaVar {
         MiniJavaVar res = new MiniJavaVar(newTypeName, null);
         res.value = objToPoint.value;
         return res;
+    }
+
+    public static MiniJavaVar makeNewObj(MiniJavaVar objToPoint) {
+        return makeNewObj(objToPoint.type, objToPoint);
     }
 
     public String toString() {

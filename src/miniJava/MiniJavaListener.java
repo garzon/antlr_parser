@@ -316,6 +316,18 @@ public interface MiniJavaListener extends ParseTreeListener {
 	 */
 	void exitGetProperty(MiniJavaParser.GetPropertyContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code logicBinaryOp}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterLogicBinaryOp(MiniJavaParser.LogicBinaryOpContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code logicBinaryOp}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitLogicBinaryOp(MiniJavaParser.LogicBinaryOpContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code newExp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
 	 * @param ctx the parse tree

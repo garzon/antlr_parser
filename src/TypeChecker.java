@@ -36,6 +36,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     private static MiniJavaVar mockVar(MiniJavaVar original) {
+        if(original.isError()) return original;
         if(original.type.equals("boolean")) return MiniJavaVar.makeBool(true);
         if(original.type.equals("int")) return MiniJavaVar.makeInt(1);
         if(MiniJavaVar.isArrayType(original.type)) {
@@ -607,6 +608,17 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return binaryOp(ctx, first, second);
     }
 
+    @Override public MiniJavaVar visitLogicBinaryOp(MiniJavaParser.LogicBinaryOpContext ctx) {
+        MiniJavaVar first = mockVar(visit(ctx.first));
+        MiniJavaVar second = mockVar(visit(ctx.second));
+        if(first.isError() || second.isError()) return MiniJavaVar.makeError();
+
+        matchType(ctx, first.type, "boolean");
+        matchType(ctx, second.type, "boolean");
+
+        return MiniJavaVar.makeBool(true);
+    }
+
     @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {
         MiniJavaVar first = mockVar(visit(ctx.first));
         MiniJavaVar second = mockVar(visit(ctx.second));
@@ -620,18 +632,22 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         switch (ctx.op.getText().charAt(0)) {
             case '!':
                 if(!checkUnaryOprType(ctx, type, "boolean")) return MiniJavaVar.makeError();
-                res.value = !(boolean)res.value;
+                res = MiniJavaVar.makeBool(!(boolean)res.value);
+                //res.value = !(boolean)res.value;
                 break;
             case '+':
                 if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
+                res = MiniJavaVar.makeInt(+(int)res.value);
                 break;
             case '-':
                 if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
-                res.value = -(int)res.value;
+                //res.value = -(int)res.value;
+                res = MiniJavaVar.makeInt(-(int)res.value);
                 break;
             case '~':
                 if(!checkUnaryOprType(ctx, type, "int")) return MiniJavaVar.makeError();
-                res.value = ~(int)res.value;
+                //res.value = ~(int)res.value;
+                res = MiniJavaVar.makeInt(~(int)res.value);
                 break;
             default:
                 return opNotImplemented(ctx, ctx.op.getText());
@@ -663,15 +679,6 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
                 return MiniJavaVar.makeBool((boolean)first.value != (boolean)second.value);
             }
             return opNotImplemented(ctx, String.format("'%s' for type '%s'", opSym, first.type));
-        }
-
-        if(opSym.equals("||")) {
-            if(!checkBinaryOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
-            return MiniJavaVar.makeBool((boolean)first.value || (boolean)second.value);
-        }
-        if(opSym.equals("&&")) {
-            if(!checkBinaryOprType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
-            return MiniJavaVar.makeBool((boolean)first.value && (boolean)second.value);
         }
 
         if(!checkBinaryOprType(ctx, first.type, "int")) return MiniJavaVar.makeError();
@@ -723,8 +730,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(opSym.equals("?")) {
             if(!matchType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
             if(!matchType(ctx, second.type, third.type)) return MiniJavaVar.makeError();
-            if((boolean)first.value) return second;
-            else return third;
+            if((boolean)first.value) return MiniJavaVar.makeNewObj(second);
+            else return MiniJavaVar.makeNewObj(third);
         }
 
         return opNotImplemented(ctx, opSym);

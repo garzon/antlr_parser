@@ -1531,6 +1531,31 @@ public class MiniJavaParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class LogicBinaryOpContext extends ExpContext {
+		public ExpContext first;
+		public Token op;
+		public ExpContext second;
+		public List<ExpContext> exp() {
+			return getRuleContexts(ExpContext.class);
+		}
+		public ExpContext exp(int i) {
+			return getRuleContext(ExpContext.class,i);
+		}
+		public LogicBinaryOpContext(ExpContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniJavaListener ) ((MiniJavaListener)listener).enterLogicBinaryOp(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniJavaListener ) ((MiniJavaListener)listener).exitLogicBinaryOp(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniJavaVisitor ) return ((MiniJavaVisitor<? extends T>)visitor).visitLogicBinaryOp(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class NewExpContext extends ExpContext {
 		public TerminalNode ID() { return getToken(MiniJavaParser.ID, 0); }
 		public NewExpContext(ExpContext ctx) { copyFrom(ctx); }
@@ -2045,28 +2070,28 @@ public class MiniJavaParser extends Parser {
 						break;
 					case 9:
 						{
-						_localctx = new BinaryOpContext(new ExpContext(_parentctx, _parentState));
-						((BinaryOpContext)_localctx).first = _prevctx;
+						_localctx = new LogicBinaryOpContext(new ExpContext(_parentctx, _parentState));
+						((LogicBinaryOpContext)_localctx).first = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_exp);
 						setState(238);
 						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
 						setState(239);
-						((BinaryOpContext)_localctx).op = match(T__58);
+						((LogicBinaryOpContext)_localctx).op = match(T__58);
 						setState(240);
-						((BinaryOpContext)_localctx).second = exp(8);
+						((LogicBinaryOpContext)_localctx).second = exp(8);
 						}
 						break;
 					case 10:
 						{
-						_localctx = new BinaryOpContext(new ExpContext(_parentctx, _parentState));
-						((BinaryOpContext)_localctx).first = _prevctx;
+						_localctx = new LogicBinaryOpContext(new ExpContext(_parentctx, _parentState));
+						((LogicBinaryOpContext)_localctx).first = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_exp);
 						setState(241);
 						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
 						setState(242);
-						((BinaryOpContext)_localctx).op = match(T__59);
+						((LogicBinaryOpContext)_localctx).op = match(T__59);
 						setState(243);
-						((BinaryOpContext)_localctx).second = exp(7);
+						((LogicBinaryOpContext)_localctx).second = exp(7);
 						}
 						break;
 					case 11:

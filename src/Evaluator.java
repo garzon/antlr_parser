@@ -191,7 +191,7 @@ public class Evaluator extends TypeChecker {
         Vector<MiniJavaVar> vec = (Vector<MiniJavaVar>) arr.value;
         if((int)idx.value >= vec.size()) return outOfRangeError(ctx);
 
-        vec.set((int)idx.value, v);
+        vec.get((int)idx.value).value = v.value;
 
         return MiniJavaVar.makeVoid();
     }
@@ -259,7 +259,8 @@ public class Evaluator extends TypeChecker {
         Vector<MiniJavaVar> vec = (Vector<MiniJavaVar>) arr.value;
         if((int)idx.value >= vec.size()) return outOfRangeError(ctx);
 
-        return vec.get((int)idx.value);
+        MiniJavaVar res = vec.get((int)idx.value);
+        return MiniJavaVar.makeNewObj(res);
     }
 
     @Override public MiniJavaVar visitGetLength(MiniJavaParser.GetLengthContext ctx) {
@@ -383,7 +384,7 @@ public class Evaluator extends TypeChecker {
             System.err.printf("\t%s.%s(): Forgot to return a value?\n", klass.name, methodName);
             return MiniJavaVar.makeError();
         }
-        return res;
+        return MiniJavaVar.makeNewObj(method.returnType.getText(), res);
     }
 
     @Override public MiniJavaVar visitDummy(MiniJavaParser.DummyContext ctx) {
@@ -407,6 +408,25 @@ public class Evaluator extends TypeChecker {
             System.out.println(second);
         }*/
         return binaryOp(ctx, first, second);
+    }
+
+    @Override public MiniJavaVar visitLogicBinaryOp(MiniJavaParser.LogicBinaryOpContext ctx) {
+        MiniJavaVar first = visit(ctx.first);
+        if(first.isError()) return first;
+        if(!matchType(ctx, first.type, "boolean")) return MiniJavaVar.makeError();
+
+        String opSym = ctx.op.getText();
+        if(opSym.equals("||")) {
+            if((boolean)first.value) return MiniJavaVar.makeBool(true);
+            return visit(ctx.second);
+        }
+
+        if(opSym.equals("&&")) {
+            if(!(boolean)first.value) return MiniJavaVar.makeBool(false);
+            return visit(ctx.second);
+        }
+
+        return opNotImplemented(ctx, opSym);
     }
 
     @Override public MiniJavaVar visitTernaryOp(MiniJavaParser.TernaryOpContext ctx) {

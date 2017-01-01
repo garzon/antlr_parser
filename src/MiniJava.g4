@@ -56,8 +56,8 @@ exp : intLiteral #literal
     | first=exp op='&' second=exp #binaryOp
     | first=exp op='^' second=exp #binaryOp
     | first=exp op='|' second=exp #binaryOp
-    | first=exp op='&&' second=exp #binaryOp
-    | first=exp op='||' second=exp #binaryOp
+    | first=exp op='&&' second=exp #logicBinaryOp
+    | first=exp op='||' second=exp #logicBinaryOp
     | first=exp op='?' second=exp ':' third=exp #ternaryOp
 
     | 'this' #this

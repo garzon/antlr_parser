@@ -193,6 +193,13 @@ public interface MiniJavaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitGetProperty(MiniJavaParser.GetPropertyContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code logicBinaryOp}
+	 * labeled alternative in {@link MiniJavaParser#exp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLogicBinaryOp(MiniJavaParser.LogicBinaryOpContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code newExp}
 	 * labeled alternative in {@link MiniJavaParser#exp}.
 	 * @param ctx the parse tree

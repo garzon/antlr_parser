@@ -352,6 +352,18 @@ public class MiniJavaBaseListener implements MiniJavaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLogicBinaryOp(MiniJavaParser.LogicBinaryOpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLogicBinaryOp(MiniJavaParser.LogicBinaryOpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNewExp(MiniJavaParser.NewExpContext ctx) { }
 	/**
 	 * {@inheritDoc}
