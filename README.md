@@ -59,6 +59,8 @@ Got output:
 
 ## Get Started
 
+java/javac version 1.7.0_55
+
 ```
 git clone https://github.com/garzon/miniJavaInterpreter.git
 cd miniJavaInterpreter
@@ -66,9 +68,8 @@ mkdir build
 cp src/ build/ -r
 cp antlr-4.6-complete.jar build/src/
 cd build/src/
-javac -classpath ./*.jar miniJava/*.java
-javac -classpath ./*.jar *.java
-java mjava ../../exampleMiniJavaProgram.java
+javac -classpath ./*.jar -d ./ miniJava/*.java *.java
+java -classpath "$(pwd):$(pwd)/antlr-4.6-complete.jar" mjava ../../exampleMiniJavaProgram.java
 ```
 
 ## Usage
