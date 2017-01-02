@@ -10,6 +10,6 @@ class MiniJava {
     }
 }
 
-class NotSeq {}
+class NotSeq { public int test() { return test(); }}
 class Seq { public boolean returnTrue(int b) { return true; } }
 class SeqSubClass extends Seq { int a; }
