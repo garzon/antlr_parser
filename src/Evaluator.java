@@ -90,6 +90,8 @@ public class Evaluator extends TypeChecker {
     }
 
     @Override public MiniJavaVar visitFor(MiniJavaParser.ForContext ctx) {
+        varCtx.enterBlock();
+
         MiniJavaVar st = visit(ctx.start_stmt);
         if(st.isError()) return st;
         MiniJavaVar criteria = visit(ctx.exp());
@@ -108,6 +110,7 @@ public class Evaluator extends TypeChecker {
             assert (matchType(ctx, criteria.type, "boolean"));
         }
 
+        varCtx.exitBlock();
         return MiniJavaVar.makeVoid();
     }
 

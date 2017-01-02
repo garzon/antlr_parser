@@ -102,7 +102,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     protected MiniJavaClass classFoundOrNot(ParserRuleContext ctx, String className) {
         MiniJavaClass res = classes.get(className);
         if(className.equals(mainClassName)) {
-            CliUtil.err(ctx, "refer to mainClass is not supported yet.", "Syntax");
+            CliUtil.err(ctx, "refer to mainClass is not supported yet.");
             hasError = true;
             return null;
         }
@@ -291,10 +291,12 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitFor(MiniJavaParser.ForContext ctx) {
+        //varCtx.enterBlock();
         MiniJavaVar st = visit(ctx.start_stmt);
         MiniJavaVar criteria = visit(ctx.exp());
         MiniJavaVar body = visit(ctx.stmtBody());
         MiniJavaVar stm = visit(ctx.step_stmt);
+        //varCtx.exitBlock();
 
         if(!criteria.isError())
             if(!matchType(ctx, criteria.type, "boolean"))
@@ -564,7 +566,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         if(sendingArgs.size()-1 != n) {
             hasError = true;
             return CliUtil.err(ctx, String.format("Number of args(%d) for calling method '%s.%s' should be %d.",
-                    sendingArgs.size()-1, id.type, methodName, n), "Syntax");
+                    sendingArgs.size()-1, id.type, methodName, n));
         }
 
         int i = 0;

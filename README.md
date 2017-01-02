@@ -6,32 +6,49 @@ Input program:
 ```java
 class MiniJava {
     public static void main(String[] args) {
-        Seq seq = new Seq().Seq(15);
-        for(int i=0; i<=15; i+=1)
-            System.out.println(seq.get_fib(i));
-        System.out.println(seq.fib_saver);
+        // polymorphism
+        Seq seq = new FactorialSeq();
+        int l = 99999999;
+        for(l=0; l<=5; l+=1)
+            System.out.println(seq.get(l));
+        seq = new FibSeq().FibSeq(10);
+        int j = 7;
+        for(l=0; l<=j; l+=1)
+            System.out.println(seq.get(l));
     }
 }
 
 class Seq {
-    int[] fib_saver;
+    public int get(int i) { return -1; }
+    private void calc(int i) { }
+}
+
+class FactorialSeq extends Seq {
+    public int get(int i) {
+        if(i < 2) return 1;
+        else return this.get(i-1)*i;
+    }
+}
+
+class FibSeq extends Seq {
+    int[] saver;
     
-    // function behave like a constructor
-    public Seq Seq(int n) {
-        fib_saver = new int[n+1];
-        fib_saver[1] = 1;
-        fib_saver[0] = 1;
+    // a function that behaves like a constructor
+    public FibSeq FibSeq(int n) {
+        saver = new int[n+1];
+        saver[1] = 1;
+        saver[0] = 1;
         for(int j=2; j<=n; j+=1)
-            this.calc_fib(j);
+            this.calc(j);
         return this;
     }
     
-    public int get_fib(int i) {
-        return this.fib_saver[i];
+    public int get(int i) {
+        return this.saver[i];
     }
     
-    private void calc_fib(int i) {
-        fib_saver[i] = fib_saver[i-1] + fib_saver[i-2];
+    private void calc(int i) {
+        saver[i] = saver[i-1] + saver[i-2];
     }
 }
 ```
@@ -41,20 +58,17 @@ Got output:
 1
 1
 2
+6
+24
+120
+1
+1
+2
 3
 5
 8
 13
 21
-34
-55
-89
-144
-233
-377
-610
-987
-[int(1), int(1), int(2), int(3), int(5), int(8), int(13), int(21), int(34), int(55), int(89), int(144), int(233), int(377), int(610), int(987)]
 ```
 
 ## Get Started

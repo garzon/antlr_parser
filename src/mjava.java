@@ -25,22 +25,21 @@ public class mjava {
 
         String sentence = new String(Files.readAllBytes(Paths.get(args[0])));
 
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRInputStream(sentence)) {
-            /*@Override public Token emit() {
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRInputStream(sentence)) {/*
+            @Override public Token emit() {
                 switch (getType()) {
-                    case UnterminatedStringLiteral:
-                        setType(StringLiteral);
+                    case INVALID_ID:
+                        // setType(ID);
                         Token result = super.emit();
-                        // you'll need to define this method
-                        reportError(result, "Unterminated string literal");
+                        int line = result.getLine(), charPos = result.getCharPositionInLine();
+                        CliUtil.errHeader("Lexical", line, charPos);
+                        String source = result.getInputStream().toString();
+                        CliUtil.underlineError(source, result, line, charPos);
                         return result;
                     default:
                         return super.emit();
                 }
             }*/
-            protected void err(String msg) {
-                System.err.println(msg);
-            }
         };
         lexer.removeErrorListeners();
         lexer.addErrorListener(new LexerErrorListener());
@@ -51,8 +50,6 @@ public class mjava {
         parser.removeErrorListeners();
         parser.addErrorListener(new ParserErrorListener());
         parser.setErrorHandler(new DefaultErrorStrategy() {
-
-
             @Override
             public void reportInputMismatch(Parser recognizer, InputMismatchException e) {
                 String msg = "mismatched input " + getTokenErrorDisplay(e.getOffendingToken());
@@ -63,7 +60,7 @@ public class mjava {
                 Token token = e.getOffendingToken();
                 if(expectingTokenString.contains("';'")) {
                     // missing ';' after declaration
-                    msg += ". maybe missing ';' before that. Has been fixed.";
+                    msg += ". maybe missing ';' before that token. Has been fixed.";
                     int line = token.getLine(), charPos = token.getCharPositionInLine();
                     CliUtil.errHeader("Syntax", line, charPos);
                     CliUtil.underlineError(recognizer, token, line, charPos);
@@ -72,21 +69,6 @@ public class mjava {
                 }
                 msg += " expecting one of " + expectingTokenString;
                 recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
-            }
-
-            @Override
-            public void reportMissingToken(Parser recognizer) {
-                /*beginErrorCondition(recognizer);
-                Token t = recognizer.getCurrentToken();
-                IntervalSet expecting = getExpectedTokens(recognizer);
-                String msg = "missing "+expecting.toString(recognizer.getTokenNames()) + " at " + getTokenErrorDisplay(t);*/
-                if(!this.inErrorRecoveryMode(recognizer)) {
-                    this.beginErrorCondition(recognizer);
-                    Token t = recognizer.getCurrentToken();
-                    IntervalSet expecting = this.getExpectedTokens(recognizer);
-                    String msg = "missing " + expecting.toString(recognizer.getVocabulary()) + " at " + this.getTokenErrorDisplay(t);
-                    recognizer.notifyErrorListeners(t, msg, (RecognitionException)null);
-                }
             }
         });
         parser.setBuildParseTree(true);

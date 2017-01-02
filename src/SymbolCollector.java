@@ -95,6 +95,13 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
         return res;
     }
 
+    /*@Override public MiniJavaVar visitFor(MiniJavaParser.ForContext ctx) {
+        varCtx.enterBlock();
+        MiniJavaVar res = visitChildren(ctx);
+        varCtx.exitBlock();
+        return res;
+    }*/
+
     @Override public MiniJavaVar visitMethodDeclaration(MiniJavaParser.MethodDeclarationContext ctx) {
         String methodName = ctx.methodName.getText();
         String permission = ctx.permissionDesc().getText();
@@ -103,7 +110,7 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
 
         if(currentClass.methods.get(methodName) != null) {
             hasSyntaxError = true;
-            return CliUtil.err(ctx, "overloaded methods are not supported yet.", "Syntax");
+            return CliUtil.err(ctx, "overloaded methods are not supported yet.");
         }
         currentClass.methods.put(methodName, ctx);
         currentClass.methodPermission.put(methodName, permission);

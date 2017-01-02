@@ -1,6 +1,5 @@
 class MiniJava {
     public static void main(String[] args) {
-        // polymorphism
         Seq seq = new FactorialSeq();
         int l = 99999999;
         for(l=0; l<=5; l+=1)

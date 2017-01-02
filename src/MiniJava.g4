@@ -1,5 +1,16 @@
 grammar MiniJava;
 
+COMMENT : '//'~[\r\n]* -> skip;
+
+INT_HEX : '0x'[0-9a-fA-F]+ ;
+INT_BIN : '0b'[01]+;
+INT_DEC : [0-9]+ ;
+
+ID : [a-zA-Z_][a-zA-Z_0-9]* ;
+//INVALID_ID : [0-9]~[ \r\t\n]* ;
+
+WS : [ \t\r\n]+ -> skip;
+
 goal : mainClass (classDeclaration)* EOF;
 
 mainClass : 'class' className=ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' args=ID ')' stmtBlock '}' ;
@@ -71,12 +82,3 @@ exp : intLiteral #literal
 
 boolLiteral : 'true' | 'false' ;
 intLiteral : INT_HEX | INT_BIN | INT_DEC ;
-
-WS : [ \t\r\n]+ -> skip ;
-COMMENT : '//'~[\r\n]* -> skip;
-
-INT_HEX : '0x'[0-9a-fA-F]+ ;
-INT_BIN : '0b'[01]+;
-INT_DEC : [0-9]+ ;
-
-ID : [a-zA-Z_][a-zA-Z_0-9]*;

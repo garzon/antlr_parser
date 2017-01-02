@@ -12,6 +12,8 @@ java mjava ../../exampleProgram/bubbleSort.java > ../bubbleSort.txt
 java mjava ../../exampleProgram/factorial.java > ../factorial.txt
 java mjava ../../exampleProgram/fib.java > ../fib.txt
 java mjava ../../exampleProgram/linearSearch.java > ../linearSearch.txt
+java mjava ../../exampleProgram/polymorphism.java > ../polymorphism.txt
+diff ../polymorphism.txt ../../exampleProgram/polymorphism.txt
 diff ../linearSearch.txt ../../exampleProgram/linearSearch.txt
 diff ../fib.txt ../../exampleProgram/fib.txt
 diff ../factorial.txt ../../exampleProgram/factorial.txt

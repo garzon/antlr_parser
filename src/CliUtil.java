@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class CliUtil {
     public static boolean isRuntime = false;
 
-    private static void underlineError(String source,
+    public static void underlineError(String source,
                                        Token offendingToken,
                                        int line,
                                        int charPositionInLine) {
