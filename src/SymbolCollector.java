@@ -112,8 +112,10 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
             hasSyntaxError = true;
             return CliUtil.err(ctx, "overloaded methods are not supported yet.");
         }
-        currentClass.methods.put(methodName, ctx);
-        currentClass.methodPermission.put(methodName, permission);
+
+        MiniJavaMethod method = new MiniJavaMethod();
+        method.method = ctx;
+        method.methodPermission = permission;
 
         varCtx.enterBlock();
 
@@ -127,8 +129,10 @@ public class SymbolCollector extends MiniJavaBaseVisitor<MiniJavaVar> {
             methodArgs.add(varType);
             varCtx.declareVar(varName, MiniJavaVar.makeVoid());
         }
-        currentClass.methodArgs.put(methodName, methodArgs);
-        currentClass.methodArgsName.put(methodName, methodArgsName);
+        method.methodArgs = methodArgs;
+        method.methodArgsName = methodArgsName;
+
+        currentClass.methods.put(methodName, method);
 
         MiniJavaVar res = visitChildren(ctx);
 

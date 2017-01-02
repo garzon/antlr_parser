@@ -311,18 +311,13 @@ public class Evaluator extends TypeChecker {
         }
 
         // now klass must be not null
-        MiniJavaParser.MethodDeclarationContext method = methodFoundOrNot(ctx, klass, methodName);
+        MiniJavaMethod method = methodFoundOrNot(ctx, klass, methodName);
         if(method == null)
             return MiniJavaVar.makeError();
 
-        Vector<String> args = klass.methodArgs.get(methodName);
-        assert (args != null);
-
-        Vector<String> argsName = klass.methodArgsName.get(methodName);
-        assert (argsName != null);
-
-        String permission = klass.methodPermission.get(methodName);
-        assert (permission != null);
+        Vector<String> args = method.methodArgs;
+        Vector<String> argsName = method.methodArgsName;
+        String permission = method.methodPermission;
 
         if(permission.equals("private")) {
             if(!id.type.equals("0this") && !currentClassName.equals(id.type)) {
@@ -374,7 +369,7 @@ public class Evaluator extends TypeChecker {
         //System.out.printf("calling %s with ", methodName);System.out.println(calculatedArgs);
 
         // calling function
-        MiniJavaVar ret = visit(method);
+        MiniJavaVar ret = visit(method.method);
 
         // recover context
         varCtx.exitBlock();
@@ -390,11 +385,11 @@ public class Evaluator extends TypeChecker {
 
         if(res == null) res = MiniJavaVar.makeVoid();
 
-        if(!matchType(ctx, res.type, method.returnType.getText())) {
+        if(!matchType(ctx, res.type, method.method.returnType.getText())) {
             System.err.printf("\t%s.%s(): Forgot to return a value?\n", klass.name, methodName);
             return MiniJavaVar.makeError();
         }
-        return MiniJavaVar.makeNewObj(method.returnType.getText(), res);
+        return MiniJavaVar.makeNewObj(method.method.returnType.getText(), res);
     }
 
     @Override public MiniJavaVar visitDummy(MiniJavaParser.DummyContext ctx) {

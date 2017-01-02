@@ -40,7 +40,7 @@ public class MiniJavaVar {
         return new MiniJavaVar("void", 0);
     }
 
-    public static MiniJavaVar makeInt(Integer v) {
+    public static MiniJavaVar makeInt(int v) {
         return new MiniJavaVar("int", v);
     }
 

@@ -113,8 +113,8 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return res;
     }
 
-    protected MiniJavaParser.MethodDeclarationContext methodFoundOrNot(ParserRuleContext ctx, MiniJavaClass klass, String methodName) {
-        MiniJavaParser.MethodDeclarationContext findRes = null;
+    protected MiniJavaMethod methodFoundOrNot(ParserRuleContext ctx, MiniJavaClass klass, String methodName) {
+        MiniJavaMethod findRes = null;
         if(klass == null) {
             // main class
             if(methodName.equals("main")) return null;
@@ -306,7 +306,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
     }
 
     @Override public MiniJavaVar visitReturn(MiniJavaParser.ReturnContext ctx) {
-        MiniJavaParser.MethodDeclarationContext currentMethod;
+        MiniJavaMethod currentMethod;
         currentMethod = methodFoundOrNot(ctx, currentClass, currentMethodName);
         String retType = "void";
         if(currentMethod == null && !currentMethodName.equals("main")) {
@@ -314,7 +314,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         }
         if(currentMethod != null) {
             // not main method of main class
-            retType = currentMethod.returnType.getText();
+            retType = currentMethod.method.returnType.getText();
         }
 
         MiniJavaVar v = visit(ctx.exp());
@@ -542,15 +542,12 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         }
 
         // now klass must be not null
-        MiniJavaParser.MethodDeclarationContext method = methodFoundOrNot(ctx, klass, methodName);
+        MiniJavaMethod method = methodFoundOrNot(ctx, klass, methodName);
         if(method == null)
             return MiniJavaVar.makeError();
 
-        Vector<String> args = klass.methodArgs.get(methodName);
-        assert (args != null);
-
-        String permission = klass.methodPermission.get(methodName);
-        assert (permission != null);
+        Vector<String> args = method.methodArgs;
+        String permission = method.methodPermission;
 
         String realObjType = klass.name;
 
@@ -582,7 +579,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
             i += 1;
         }
 
-        String retType = method.returnType.getText();
+        String retType = method.method.returnType.getText();
         MiniJavaVar res = makeInitVar(ctx, retType);
         if(res.value instanceof MiniJavaInstance) {
             res = createInstance(ctx, retType);
