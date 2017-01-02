@@ -94,91 +94,84 @@ java -classpath "$(pwd):$(pwd)/antlr-4.6-complete.jar" mjava ../../exampleMiniJa
 - Run mini java program without any OPTION
 - Print the lisp-style AST with `--tree` option
 
-## Grammar
+## Extra features
 
-Please refer to `src/MiniJava.g4` to get more details.
+#### Interpreter features
 
+- Correct output(with bugs somewhere..?)
+- COMPLETE static type checking
+- Friendly syntax, semantic and runtime error message
 ```
-grammar MiniJava;
+[Semantic ERR] Line 3, Char 32:
+        Seq err = new Seq().Seq(false);
+                                ^^^^^
+	Type error: 'int' expected, got 'boolean'
 
-goal : mainClass (classDeclaration)* EOF;
+[Semantic ERR] Line 5, Char 16:
+        Seq a = new NotExistClass();
+                ^^^
+	class 'NotExistClass' undefined
 
-mainClass : 'class' className=ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' args=ID ')' stmtBlock '}' ;
+[Semantic ERR] Line 10, Char 27:
+        System.out.println seq.calc_fib(10);
+                           ^^^
+	Cannot access private method 'Seq.calc_fib'.
 
-classDeclaration : 'class' className=ID ('extends' parentName=ID)? '{' (declaration)* '}' ;
-declaration : propertyDeclaration | methodDeclaration ;
-propertyDeclaration : varDeclaration ;
-varDeclaration : type ID ('=' exp)? ';' ;
-permissionDesc : 'public' | 'private' ;
-argPair : type ID ;
-methodDeclaration : permissionDesc? returnType=type methodName=ID '(' (argPair (',' argPair)* )? ')' stmtBlock ;
+[Syntax ERR] Line 12, Char 16:
+        int z = seq.do_not_exist;
+                ^^^
+	Property 'do_not_exist' of class 'Seq' not found.
 
-type : arrType | basicType;
-arrType : basicType '[' ']' ;
-basicType : 'boolean' | 'int' | 'void' | ID;
-
-stmtBlock : '{' (stmt)* '}' ;
-
-assignSym : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&='
-    | '|=' | '^=' | '<<=' | '>>=' | '>>>='
-;
-
-stmtBody : ID assignSym v=exp #assign
-    | ID '[' idx=exp ']' assignSym v=exp #setIndexOf
-    | exp #stmtExp
-    | prop=exp assignSym exp #assignToExp
-    | 'return' exp #return
-;
-
-stmt : varDeclaration #var
-    | stmtBlock #block
-    | 'if' '(' exp ')' t_stmt=stmt ('else' f_stmt=stmt)? #if
-    | 'while' '(' exp ')' stmt #while
-    | 'for' '(' start_stmt=stmt exp ';' step_stmt=stmtBody ')' body=stmt #for
-    | systemCallName='System.out.println' lpar='(' exp rpar=')' ';' #systemCall
-    | systemCallName='System.out.println' exp ';' #systemCall
-    | stmtBody ';' #normalStmt
-    | ';' #emptyStmt
-;
-
-exp : intLiteral #literal
-    | boolLiteral #literal
-    | '(' exp ')' #dummy
-    | '(' exp #missingRP
-
-    | id=exp '.' ID '(' (exp (',' exp)* )? ')' #getMethod
-    | id=exp '.' 'length' #getLength
-    | id=exp '.' ID #getProperty
-    | id=exp '[' idx=exp ']' #indexOf
-
-    | op=('!' | '+' | '-' | '~') first=exp #unaryOp
-    | first=exp op=('*' | '/' | '%') second=exp #binaryOp
-    | first=exp op=('+' | '-') second=exp #binaryOp
-    | first=exp op=('<<' | '>>' | '>>>') second=exp #binaryOp
-    | first=exp op=('<' | '>' | '<=' | '>=') second=exp #binaryOp
-    | first=exp op=('==' | '!=') second=exp #binaryOp
-    | first=exp op='&' second=exp #binaryOp
-    | first=exp op='^' second=exp #binaryOp
-    | first=exp op='|' second=exp #binaryOp
-    | first=exp op='&&' second=exp #logicBinaryOp
-    | first=exp op='||' second=exp #logicBinaryOp
-    | first=exp op='?' second=exp ':' third=exp #ternaryOp
-
-    | 'this' #this
-    | 'new' basicType '[' exp ']' #newArr
-    | 'new' ID '(' ')' #newExp
-    | ID #id
-;
-
-boolLiteral : 'true' | 'false' ;
-intLiteral : INT_HEX | INT_BIN | INT_DEC ;
-
-WS : [ \t\r\n]+ -> skip ;
-COMMENT : '//'~[\r\n]* -> skip;
-
-INT_HEX : '0x'[0-9a-fA-F]+ ;
-INT_BIN : '0b'[01]+;
-INT_DEC : [0-9]+ ;
-
-ID : [a-zA-Z_][a-zA-Z_0-9]*;
+[Semantic ERR] Line 14, Char 8:
+        if(shouldBeBool) {
+        ^^
+	Type error: 'boolean' expected, got 'int'
 ```
+
+#### Language features
+
+- For statememt
+```java
+for(l=0; l<=15; l+=1)
+    System.out.println(seq.get_fib(l));
+```
+
+- Private method
+```java
+class FibSeq extends Seq {
+    private void calc_fib() { }
+}
+```
+
+- Assign when declaring everywhere
+```java
+if(true) {
+    int i = 1;
+    return 1;
+    int k = 2;
+}
+int i = 2;
+```
+
+- All java operators
+```java
+int i = (1 ^ 2 & 3) > 4 ? 5 : 6;
+```
+
+- Integer literals
+```java
+int i = 0xDEADBEEF; int j = 0b01010101;
+```
+
+- Polymorphism
+```java
+ReturnValClass res = new Return1();
+System.out.println(res.get()); // output: 1
+res = new Return2();
+System.out.println(res.get()); // output: 2
+class ReturnValClass{}
+class Return1 extends ReturnValClass{public int get(){return 1;}}
+class Return2 extends ReturnValClass{public int get(){return 2;}}
+```
+
+- Etc...
