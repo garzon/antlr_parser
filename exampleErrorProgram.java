@@ -2,6 +2,8 @@ class MiniJava {
     public static void main(String[] args) {
         Seq err = new Seq().Seq(false);
         Seq seq = new Seq().Seq(20);
+        Seq a = new NotExistClass();
+        int k
         int l;
         for(l=0; l<=15; l+=1)
             System.out.println(seq.get_fib(l));
@@ -19,6 +21,7 @@ class MiniJava {
 
 class Seq {
     int[] fib_saver;
+    //YetAnotherNotExistClass ttt;
     
     // function behave like a constructor
     public Seq Seq(int n) {

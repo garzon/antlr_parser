@@ -588,9 +588,18 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         return res;
     }
 
-    private boolean divBy0(MiniJavaParser.BinaryOpContext ctx, int vNotZero) {
+    protected boolean divBy0(MiniJavaParser.BinaryOpContext ctx, int vNotZero) {
         if(vNotZero == 0) {
             CliUtil.err(ctx, String.format("Op '%s': divided by zero", ctx.op.getText()));
+            hasError = true;
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean divBy0(MiniJavaParser.AssignContext ctx, MiniJavaVar vNotZero) {
+        if((int)vNotZero.value == 0) {
+            CliUtil.err(ctx, String.format("Op '%s': divided by zero", ctx.assignSym().getText()));
             hasError = true;
             return true;
         }

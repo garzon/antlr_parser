@@ -74,14 +74,15 @@ public class CliUtil {
         return MiniJavaVar.makeError();
     }
 
+    public static void errHeader(String errType, int line, int charPos) {
+        System.err.printf("[%s%s ERR] Line %d, Char %d:\n",
+                isRuntime ? "Runtime " : "", errType, line, charPos);
+    }
+
     public static MiniJavaVar err(ParserRuleContext ctx, String msg, String errType) {
         Token firstToken = ctx.getStart();
         String source = firstToken.getInputStream().toString();
-        System.err.printf("[%s%s ERR] Line %d, Char %d:\n",
-                isRuntime ? "Runtime " : "",
-                errType,
-                firstToken.getLine(),
-                firstToken.getCharPositionInLine());
+        errHeader(errType, firstToken.getLine(), firstToken.getCharPositionInLine());
         underlineError(source, firstToken, firstToken.getLine(), firstToken.getCharPositionInLine());
         System.err.printf("\t%s\n\n", msg);
         return MiniJavaVar.makeError();

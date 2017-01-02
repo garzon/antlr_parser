@@ -60,9 +60,15 @@ public class mjava {
                 String[] tokenNames = recognizer.getTokenNames();
                 Vocabulary voc = VocabularyImpl.fromTokenNames(tokenNames);
                 String expectingTokenString = expectedTokens.toString(voc);
+                Token token = e.getOffendingToken();
                 if(expectingTokenString.contains("';'")) {
                     // missing ';' after declaration
-                    msg += ". maybe missing ';' before that.";
+                    msg += ". maybe missing ';' before that. Has been fixed.";
+                    int line = token.getLine(), charPos = token.getCharPositionInLine();
+                    CliUtil.errHeader("Syntax", line, charPos);
+                    CliUtil.underlineError(recognizer, token, line, charPos);
+                    System.err.printf("\t%s\n\n", msg);
+                    return;
                 }
                 msg += " expecting one of " + expectingTokenString;
                 recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);

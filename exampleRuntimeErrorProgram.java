@@ -1,12 +1,12 @@
 class MiniJava {
     public static void main(String[] args) {
-        Seq seq = new Seq().Seq(true);
-        int k = 1;
+        Seq seq = new Seq().Seq(15);
+        int k = 1
         int zero = 0;
-        k /= 0;
         int l;
         for(l=0; l<=15; l+=1)
             System.out.println(seq.get_fib(l));
+        k /= 0;
     }
 }
 

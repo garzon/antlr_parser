@@ -142,8 +142,16 @@ public class Evaluator extends TypeChecker {
 
         assert (checkAssignOprType(ctx, findRes.type, "int"));// return MiniJavaVar.makeError();
         if(assignSym.equals("*=")) { findRes.value = (int)findRes.value * (int)v.value; return findRes; }
-        if(assignSym.equals("/=")) { findRes.value = (int)findRes.value / (int)v.value; return findRes; }
-        if(assignSym.equals("%=")) { findRes.value = (int)findRes.value % (int)v.value; return findRes; }
+        if(assignSym.equals("/=")) {
+            if(divBy0(ctx, v)) return MiniJavaVar.makeError();
+            findRes.value = (int)findRes.value / (int)v.value;
+            return findRes;
+        }
+        if(assignSym.equals("%=")) {
+            if(divBy0(ctx, v)) return MiniJavaVar.makeError();
+            findRes.value = (int)findRes.value % (int)v.value;
+            return findRes;
+        }
         if(assignSym.equals("&=")) { findRes.value = (int)findRes.value & (int)v.value; return findRes; }
         if(assignSym.equals("|=")) { findRes.value = (int)findRes.value | (int)v.value; return findRes; }
         if(assignSym.equals("^=")) { findRes.value = (int)findRes.value ^ (int)v.value; return findRes; }
