@@ -2,9 +2,11 @@ class MiniJava {
     public static void main(String[] args) {
         Seq seq = new NotSeq();   // error
         // polymorphism
-        Seq seq = new SeqSubClass();  // ok
-        int a = 1 + seq.returnTrue(seq.returnTrue()) * 3;
-        for(int b = seq.a; b; b += 1);
+        Seq seq2 = new SeqSubClass();  // ok
+        int a = 1 + seq2.returnTrue(seq2.returnTrue()) * 3;
+        boolean b = (1+seq2.a);
+        int c; int d;
+        for(c = 1; c; d += 1);
     }
 }
 

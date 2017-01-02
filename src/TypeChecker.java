@@ -299,7 +299,7 @@ public class TypeChecker extends MiniJavaBaseVisitor<MiniJavaVar> {
         //varCtx.exitBlock();
 
         if(!criteria.isError())
-            if(!matchType(ctx, criteria.type, "boolean"))
+            if(!matchType(ctx.exp(), criteria.type, "boolean"))
                 return MiniJavaVar.makeError();
 
         return !st.isError() && !criteria.isError() && !body.isError() && !stm.isError() ? MiniJavaVar.makeVoid() : MiniJavaVar.makeError();

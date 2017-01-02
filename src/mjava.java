@@ -58,6 +58,14 @@ public class mjava {
                 Vocabulary voc = VocabularyImpl.fromTokenNames(tokenNames);
                 String expectingTokenString = expectedTokens.toString(voc);
                 Token token = e.getOffendingToken();
+                if(e.getOffendingToken().getText().equals("(")) {
+                    msg += ". maybe calling a method but missing 'EXPRESSION.' before that token.";
+                    int line = token.getLine(), charPos = token.getCharPositionInLine();
+                    CliUtil.errHeader("Syntax", line, charPos);
+                    CliUtil.underlineError(recognizer, token, line, charPos);
+                    System.err.printf("\t%s\n\n", msg);
+                    return;
+                }
                 if(expectingTokenString.contains("';'")) {
                     // missing ';' after declaration
                     msg += ". maybe missing ';' before that token. Has been fixed.";
